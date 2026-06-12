@@ -1,0 +1,6 @@
+# Extra packages needed ONLY for dataset preparation (not needed at runtime)
+datasets==3.6.0          # HuggingFace datasets (PlantVillage)
+kaggle==1.7.4.5          # Kaggle CLI (cassava dataset)
+Pillow==11.2.1
+tqdm==4.67.1
+requests==2.32.3

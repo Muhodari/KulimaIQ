@@ -1,0 +1,1068 @@
+{
+  "_comment": "Disease → treatment & prevention recommendations. Keys match class folder names.",
+
+  "healthy": {
+    "severity": "none",
+    "title": "Plant Healthy",
+    "summary": "No disease detected. Your crop looks healthy!",
+    "actions": [
+      "Maintain current watering and fertilisation schedule.",
+      "Continue regular scouting every 7–10 days.",
+      "Remove any weeds that compete for nutrients.",
+      "Keep field records for future comparison."
+    ]
+  },
+
+  "cassava_mosaic": {
+    "severity": "high",
+    "title": "Cassava Mosaic Disease (CMD)",
+    "summary": "Caused by Cassava Mosaic Virus (CMV), spread by whitefly. Can cause 20–80% yield loss.",
+    "actions": [
+      "Immediately rogue out and destroy severely infected plants.",
+      "Use certified CMD-resistant varieties (e.g., TME 204, NASE 14).",
+      "Control whitefly vectors with neem-based sprays or approved insecticides.",
+      "Plant clean, disease-free cuttings from certified sources.",
+      "Avoid moving planting material from affected to healthy areas."
+    ]
+  },
+
+  "cassava_bacterial_blight": {
+    "severity": "high",
+    "title": "Cassava Bacterial Blight (CBB)",
+    "summary": "Caused by Xanthomonas axonopodis pv. manihotis. Affects leaves, stems and vascular tissue.",
+    "actions": [
+      "Remove and burn infected plants and plant debris.",
+      "Use clean, pathogen-free cuttings.",
+      "Avoid working in fields when plants are wet.",
+      "Apply copper-based bactericides as a preventive measure.",
+      "Use resistant varieties where available."
+    ]
+  },
+
+  "cassava_brown_streak": {
+    "severity": "high",
+    "title": "Cassava Brown Streak Disease (CBSD)",
+    "summary": "Caused by Cassava Brown Streak Virus; whitefly-transmitted. Causes distinctive brown streaks on stems and root necrosis.",
+    "actions": [
+      "Use CBSD-tolerant/resistant varieties (e.g., NASE 19, Kiroba).",
+      "Obtain planting material from certified, virus-tested sources.",
+      "Control whitefly population with neem oil or approved systemic insecticides.",
+      "Rogue infected plants early before the virus spreads further.",
+      "Avoid replanting from field that had CBSD."
+    ]
+  },
+
+  "maize_necrosis": {
+    "severity": "high",
+    "title": "Maize Lethal Necrosis (MLN)",
+    "summary": "Caused by co-infection of MCMV and SCMV. One of the most destructive maize diseases in East Africa.",
+    "actions": [
+      "Remove and destroy all infected plants immediately.",
+      "Control thrips and aphids (MLN vectors) with systemic insecticides.",
+      "Plant MLN-tolerant hybrids (WEMA tolerant hybrids, H614D).",
+      "Avoid ratooning maize in affected areas.",
+      "Observe a maize-free period of at least 3 months in severely affected areas."
+    ]
+  },
+
+  "maize_common_rust": {
+    "severity": "medium",
+    "title": "Maize Common Rust",
+    "summary": "Caused by Puccinia sorghi. Circular to elongated brown-orange pustules on leaves.",
+    "actions": [
+      "Plant rust-resistant hybrids suited to your region.",
+      "Apply foliar fungicides (e.g., mancozeb, propiconazole) at early infection.",
+      "Avoid excessive nitrogen fertilisation which promotes rust development.",
+      "Scout regularly and act early when <5% of leaf area is affected.",
+      "Remove heavily infected leaves to reduce spore load."
+    ]
+  },
+
+  "maize_gray_leaf_spot": {
+    "severity": "medium",
+    "title": "Maize Gray Leaf Spot (GLS)",
+    "summary": "Caused by Cercospora zeae-maydis. Grey, rectangular lesions running parallel to leaf veins.",
+    "actions": [
+      "Use GLS-resistant hybrids.",
+      "Rotate crops — avoid consecutive maize seasons on same plot.",
+      "Incorporate or remove crop residues after harvest.",
+      "Apply fungicide (strobilurin-based) when disease appears before silking.",
+      "Ensure adequate plant spacing for air circulation."
+    ]
+  },
+
+  "maize_northern_leaf_blight": {
+    "severity": "medium",
+    "title": "Northern Leaf Blight (NLB)",
+    "summary": "Caused by Exserohilum turcicum. Long, grey-green cigar-shaped lesions on upper leaves.",
+    "actions": [
+      "Rotate with non-grass crops (beans, soybeans).",
+      "Plant resistant hybrids with Ht resistance genes.",
+      "Apply mancozeb or propiconazole at first sign of lesions.",
+      "Manage crop residues by deep ploughing or burning after harvest.",
+      "Avoid overhead irrigation that promotes leaf wetness."
+    ]
+  },
+
+  "maize_streak_virus": {
+    "severity": "high",
+    "title": "Maize Streak Virus (MSV)",
+    "summary": "Transmitted by leafhoppers. Causes characteristic yellow streaks along leaf veins.",
+    "actions": [
+      "Plant MSV-resistant varieties (most commercial hybrids have resistance).",
+      "Control leafhopper vectors with insecticides at emergence.",
+      "Plant during cooler seasons when leafhopper populations are low.",
+      "Remove infected plants early to reduce spread.",
+      "Avoid planting near infected grass weeds and old maize fields."
+    ]
+  },
+
+  "banana_wilt": {
+    "severity": "high",
+    "title": "Banana Xanthomonas Wilt (BXW)",
+    "summary": "Caused by Xanthomonas vasicola pv. musacearum. The most devastating banana disease in East/Central Africa.",
+    "actions": [
+      "Single Diseased Stem Removal (SDSR): cut out wilted stems at ground level.",
+      "Sterilise machetes and tools with 20% bleach solution between plants.",
+      "Use male bud removal to eliminate the main infection pathway.",
+      "Remove and bury all infected plant material.",
+      "Plant clean, BXW-free suckers or in vitro plantlets from certified sources."
+    ]
+  },
+
+  "banana_fusarium_wilt": {
+    "severity": "high",
+    "title": "Banana Fusarium Wilt (Panama Disease / TR4)",
+    "summary": "Caused by Fusarium oxysporum f. sp. cubense. Causes internal yellowing and wilting; no chemical cure.",
+    "actions": [
+      "Quarantine infected fields — do not move soil or plant material.",
+      "Plant TR4-resistant varieties (e.g., FHIA-01, NARITA).",
+      "Improve soil drainage; the pathogen thrives in waterlogged soils.",
+      "Monitor for early wilting symptoms and act immediately.",
+      "Report suspected TR4 outbreaks to local agricultural authorities."
+    ]
+  },
+
+  "banana_sigatoka": {
+    "severity": "medium",
+    "title": "Black Sigatoka",
+    "summary": "Caused by Pseudocercospora fijiensis. Yellow-brown leaf streaks progressing to leaf death.",
+    "actions": [
+      "Apply approved fungicides (triazoles, strobilurins) on a calendar schedule.",
+      "Remove and destroy infected leaves (leaf stripping).",
+      "Ensure good drainage and avoid overhead irrigation.",
+      "Plant tolerant varieties where available.",
+      "Maintain adequate plant spacing to reduce humidity."
+    ]
+  },
+
+  "tomato_late_blight": {
+    "severity": "high",
+    "title": "Tomato Late Blight",
+    "summary": "Caused by Phytophthora infestans. Water-soaked lesions that rapidly turn brown; can destroy a crop in days.",
+    "actions": [
+      "Apply systemic fungicides (metalaxyl+mancozeb) preventively in wet weather.",
+      "Remove and dispose of infected plant parts immediately.",
+      "Avoid overhead irrigation; water at the base of plants.",
+      "Use resistant varieties (e.g., Heinz 1350, Shanty).",
+      "Rotate crops and do not plant tomato/potato together."
+    ]
+  },
+
+  "tomato_early_blight": {
+    "severity": "medium",
+    "title": "Tomato Early Blight",
+    "summary": "Caused by Alternaria solani. Dark brown spots with concentric rings ('target' pattern) on lower leaves.",
+    "actions": [
+      "Remove lower infected leaves and dispose of them away from the field.",
+      "Apply chlorothalonil or mancozeb fungicide as a preventive spray.",
+      "Mulch around plants to prevent soil splash spreading spores.",
+      "Use resistant hybrids where possible.",
+      "Avoid working in fields when plants are wet."
+    ]
+  },
+
+  "tomato_bacterial_spot": {
+    "severity": "medium",
+    "title": "Tomato Bacterial Spot",
+    "summary": "Caused by Xanthomonas spp. Small, water-soaked spots on leaves, fruit, and stems.",
+    "actions": [
+      "Use copper-based bactericides (copper hydroxide) at first symptom.",
+      "Use certified disease-free seed and transplants.",
+      "Avoid overhead irrigation; drip irrigation is preferable.",
+      "Remove and destroy infected plant material.",
+      "Apply mancozeb+copper fungicide combination in severe cases."
+    ]
+  },
+
+  "tomato_leaf_mold": {
+    "severity": "low",
+    "title": "Tomato Leaf Mold",
+    "summary": "Caused by Passalora fulva. Pale green-yellow spots on upper leaves; olive-green mould on undersides.",
+    "actions": [
+      "Improve greenhouse/field ventilation to reduce humidity.",
+      "Apply chlorothalonil or copper-based fungicide when symptoms appear.",
+      "Remove severely infected leaves.",
+      "Avoid wetting foliage; use drip irrigation.",
+      "Plant resistant varieties (e.g., Heinz 1350 in open field)."
+    ]
+  },
+
+  "tomato_septoria_leaf_spot": {
+    "severity": "medium",
+    "title": "Tomato Septoria Leaf Spot",
+    "summary": "Caused by Septoria lycopersici. Small, circular spots with dark borders and lighter centres.",
+    "actions": [
+      "Remove infected lower leaves as soon as symptoms appear.",
+      "Mulch to reduce soil splash.",
+      "Apply mancozeb or chlorothalonil fungicide on a 7–10 day schedule.",
+      "Rotate crops — avoid solanaceous crops for at least 2 years.",
+      "Use stakes/trellises to improve air circulation."
+    ]
+  },
+
+  "tomato_spider_mites": {
+    "severity": "medium",
+    "title": "Tomato Two-Spotted Spider Mite",
+    "summary": "Two-spotted spider mite (Tetranychus urticae). Yellow stippling on leaves; fine webbing on underside.",
+    "actions": [
+      "Apply acaricide (abamectin, spiromesifen) at first sign of stippling.",
+      "Spray under leaves — that is where mites live.",
+      "Maintain adequate soil moisture — drought stress worsens mite outbreaks.",
+      "Introduce predatory mites (Phytoseiulus persimilis) as biological control.",
+      "Avoid broad-spectrum insecticides that kill natural enemies."
+    ]
+  },
+
+  "tomato_target_spot": {
+    "severity": "medium",
+    "title": "Tomato Target Spot",
+    "summary": "Caused by Corynespora cassiicola. Brown, concentric ring spots on leaves, stems, and fruit.",
+    "actions": [
+      "Apply fungicide (azoxystrobin, chlorothalonil) when conditions are warm and humid.",
+      "Remove infected plant material.",
+      "Improve canopy aeration through proper pruning and staking.",
+      "Rotate crops with non-solanaceous plants.",
+      "Use resistant varieties when available."
+    ]
+  },
+
+  "tomato_yellow_leaf_curl_virus": {
+    "severity": "high",
+    "title": "Tomato Yellow Leaf Curl Virus (TYLCV)",
+    "summary": "Transmitted by whitefly Bemisia tabaci. Severe yellowing, leaf curl, and stunted plants.",
+    "actions": [
+      "Control whitefly with imidacloprid or thiamethoxam systemic insecticides.",
+      "Use yellow sticky traps to monitor and reduce whitefly populations.",
+      "Plant TYLCV-resistant varieties (Tylka F1, Bellfort F1).",
+      "Use reflective silver mulch to deter whitefly.",
+      "Remove and destroy infected plants early to reduce virus reservoir."
+    ]
+  },
+
+  "tomato_mosaic_virus": {
+    "severity": "medium",
+    "title": "Tomato Mosaic Virus (ToMV)",
+    "summary": "Mechanically transmitted; causes mosaic mottling and distorted fruit.",
+    "actions": [
+      "Use certified ToMV-resistant seed (Tm-2 gene varieties).",
+      "Wash hands and sterilise tools frequently.",
+      "Do not work with tobacco before handling tomato plants.",
+      "Remove and destroy infected plants.",
+      "Avoid excessive nitrogen fertilisation."
+    ]
+  },
+
+  "potato_late_blight": {
+    "severity": "high",
+    "title": "Potato Late Blight",
+    "summary": "Caused by Phytophthora infestans. Water-soaked lesions on leaves; rapidly destroys haulm and tubers.",
+    "actions": [
+      "Apply metalaxyl-mancozeb or cymoxanil fungicides preventively in cool, wet conditions.",
+      "Destroy infected haulm before harvest.",
+      "Use certified seed tubers from disease-free sources.",
+      "Plant resistant varieties (e.g., Shangi, Markies, Unica).",
+      "Hill up to protect tubers from rain-splashed spores."
+    ]
+  },
+
+  "potato_early_blight": {
+    "severity": "medium",
+    "title": "Potato Early Blight",
+    "summary": "Caused by Alternaria solani. Dark, leathery spots with concentric rings on lower leaves.",
+    "actions": [
+      "Apply mancozeb or chlorothalonil fungicide preventively.",
+      "Remove and destroy infected leaves.",
+      "Maintain adequate plant nutrition — stressed plants are more susceptible.",
+      "Rotate with non-solanaceous crops for 2–3 years.",
+      "Avoid overhead irrigation."
+    ]
+  },
+
+  "bean_angular_spot": {
+    "severity": "medium",
+    "title": "Bean Angular Leaf Spot",
+    "summary": "Caused by Phaeoisariopsis griseola. Angular, grey-brown spots on leaves constrained by leaf veins.",
+    "actions": [
+      "Use certified disease-free seed.",
+      "Apply mancozeb or thiram-based fungicide at first symptom.",
+      "Rotate with non-legume crops for at least one season.",
+      "Remove and destroy crop residues after harvest.",
+      "Plant tolerant varieties (e.g., CAL 96, RWR 719)."
+    ]
+  },
+
+  "bean_rust": {
+    "severity": "medium",
+    "title": "Bean Rust",
+    "summary": "Caused by Uromyces appendiculatus. Rust-coloured pustules on leaf undersides.",
+    "actions": [
+      "Apply tebuconazole or mancozeb fungicide at pustule appearance.",
+      "Increase plant spacing to improve air circulation.",
+      "Avoid late planting seasons associated with high humidity.",
+      "Use rust-tolerant varieties where available.",
+      "Remove and destroy infected plant debris after harvest."
+    ]
+  },
+
+  "bean_common_mosaic": {
+    "severity": "high",
+    "title": "Bean Common Mosaic Virus (BCMV)",
+    "summary": "Seed-borne and aphid-transmitted virus. Yellow-green mosaic and plant dwarfing.",
+    "actions": [
+      "Use certified, BCMV-indexed seed from reputable sources.",
+      "Plant BCMV-resistant varieties (e.g., Lyamungu 85).",
+      "Control aphid vectors with insecticides or reflective mulch.",
+      "Remove infected plants to reduce spread.",
+      "Do not save seed from infected plants."
+    ]
+  },
+
+  "coffee_leaf_rust": {
+    "severity": "high",
+    "title": "Coffee Leaf Rust (CLR)",
+    "summary": "Caused by Hemileia vastatrix. Orange-yellow powdery pustules on leaf undersides; causes heavy defoliation.",
+    "actions": [
+      "Apply copper-based or triazole fungicide preventively at onset of rainy season.",
+      "Use CLR-resistant/tolerant varieties (Ruiru 11, Batian, Catimor).",
+      "Prune to improve canopy air flow.",
+      "Maintain adequate nutrition — balanced N, K reduces susceptibility.",
+      "Dispose of fallen infected leaves."
+    ]
+  },
+
+  "coffee_berry_disease": {
+    "severity": "high",
+    "title": "Coffee Berry Disease (CBD)",
+    "summary": "Caused by Colletotrichum kahawae. Black, mummified berries. Major loss in highland East Africa.",
+    "actions": [
+      "Apply copper oxychloride spray at first berry set and repeat every 3 weeks.",
+      "Harvest and remove all ripe and overripe berries.",
+      "Use CBD-resistant varieties (Ruiru 11, Batian).",
+      "Prune coffee trees to reduce canopy density.",
+      "Collect and burn mummified berries."
+    ]
+  },
+
+  "coffee_wilt": {
+    "severity": "high",
+    "title": "Coffee Wilt Disease (CWD) / Tracheomycosis",
+    "summary": "Caused by Gibberella xylarioides. Causes rapid wilting and death of branches; blue-green staining of wood.",
+    "actions": [
+      "Rogue and burn infected trees immediately.",
+      "Sterilise pruning tools between trees.",
+      "Plant tolerant varieties (Timor Hybrid derivates).",
+      "Avoid wounding stems; borer entry creates infection points.",
+      "Report severe outbreaks to national coffee authority."
+    ]
+  },
+
+  "rice_blast": {
+    "severity": "high",
+    "title": "Rice Blast",
+    "summary": "Caused by Magnaporthe oryzae. Diamond-shaped grey lesions with brown borders. Affects all above-ground parts.",
+    "actions": [
+      "Apply tricyclazole or azoxystrobin fungicide at blast warning conditions.",
+      "Plant blast-resistant varieties (e.g., NERICA, IR64).",
+      "Avoid excessive nitrogen application — it increases blast severity.",
+      "Ensure uniform water depth in paddies.",
+      "Remove and destroy infected plant debris."
+    ]
+  },
+
+  "rice_brown_spot": {
+    "severity": "medium",
+    "title": "Rice Brown Spot",
+    "summary": "Caused by Cochliobolus miyabeanus. Circular to oval brown spots; indicator of nutrient stress.",
+    "actions": [
+      "Apply potassium and silica fertilisers to reduce susceptibility.",
+      "Seed treat with thiram or carbendazim before planting.",
+      "Apply mancozeb or iprodione at early infection stage.",
+      "Use balanced fertilisation (avoid excess nitrogen with low potassium).",
+      "Use certified disease-free seed."
+    ]
+  },
+
+  "rice_bacterial_blight": {
+    "severity": "high",
+    "title": "Rice Bacterial Blight (Kresek)",
+    "summary": "Caused by Xanthomonas oryzae pv. oryzae. Leaf margins turn yellow then white; severe wilting in seedlings.",
+    "actions": [
+      "Plant resistant varieties (e.g., IR36, WITA 4).",
+      "Apply copper bactericide at early symptom detection.",
+      "Drain fields during disease development to reduce humidity.",
+      "Use clean irrigation water; disease spreads through water.",
+      "Avoid excessive nitrogen fertilisation."
+    ]
+  },
+
+  "sweet_potato_virus": {
+    "severity": "medium",
+    "title": "Sweet Potato Virus Disease (SPVD)",
+    "summary": "Co-infection of SPCSV and SPFMV, whitefly-transmitted. Severe mosaic, distortion and stunting.",
+    "actions": [
+      "Use virus-free planting material from certified clean sources.",
+      "Control whitefly vectors with neem extracts or insecticides.",
+      "Rogue out severely infected plants.",
+      "Plant resistant varieties (e.g., SPK004 'Kakamega').",
+      "Avoid planting near old, infected sweet potato plots."
+    ]
+  },
+
+  "sweet_potato_weevil": {
+    "severity": "high",
+    "title": "Sweet Potato Weevil",
+    "summary": "Cylas spp. Larvae tunnel into roots causing bitterness and rendering tubers inedible.",
+    "actions": [
+      "Hill up around plants to cover exposed roots.",
+      "Irrigate regularly — weevils are worse in drought conditions.",
+      "Harvest at maturity; do not leave in ground after maturity.",
+      "Use weevil-resistant varieties (e.g., Naspot 1-12 series).",
+      "Apply entomopathogenic nematodes as biological control."
+    ]
+  },
+
+  "sorghum_leaf_blight": {
+    "severity": "medium",
+    "title": "Sorghum Leaf Blight",
+    "summary": "Caused by Exserohilum turcicum. Oval-shaped tan lesions with yellow halos on leaves.",
+    "actions": [
+      "Plant resistant varieties.",
+      "Apply mancozeb or propiconazole fungicide at first symptom.",
+      "Rotate sorghum with non-grass crops.",
+      "Remove and burn infected crop debris.",
+      "Ensure adequate plant spacing."
+    ]
+  },
+
+  "sorghum_downy_mildew": {
+    "severity": "high",
+    "title": "Sorghum Downy Mildew",
+    "summary": "Caused by Peronosclerospora sorghi. Pale green-yellow leaves with white downy growth; sterile plants.",
+    "actions": [
+      "Use metalaxyl seed treatment before planting.",
+      "Plant resistant varieties.",
+      "Rogue and destroy systemically infected plants early.",
+      "Rotate with non-grass crops for 2+ years.",
+      "Avoid planting in fields with history of SDM."
+    ]
+  },
+
+  "wheat_rust": {
+    "severity": "high",
+    "title": "Wheat Stem/Leaf Rust",
+    "summary": "Caused by Puccinia spp. Rust-coloured pustules on leaves and stems. Can cause total crop loss.",
+    "actions": [
+      "Plant rust-resistant varieties (recommend varieties released by CIMMYT).",
+      "Apply triazole fungicide (tebuconazole) preventively.",
+      "Monitor fields regularly during cool, humid weather.",
+      "Harvest early in severe epidemics to limit yield loss.",
+      "Avoid growing susceptible varieties in regions with known rust pressure."
+    ]
+  },
+
+  "wheat_septoria": {
+    "severity": "medium",
+    "title": "Wheat Septoria Leaf Blotch",
+    "summary": "Caused by Zymoseptoria tritici. Tan lesions with yellow halos and black pycnidia on lower leaves.",
+    "actions": [
+      "Apply fungicide (azoxystrobin + propiconazole) at GS31–39.",
+      "Use resistant or partially resistant varieties.",
+      "Rotate with non-wheat crops for at least one year.",
+      "Bury infected stubble through ploughing.",
+      "Avoid sowing in very late season with high rainfall."
+    ]
+  },
+
+  "groundnut_leaf_spot": {
+    "severity": "medium",
+    "title": "Groundnut Leaf Spot (Early/Late)",
+    "summary": "Caused by Cercosporidium personatum (late) or Cercospora arachidicola (early). Dark spots causing premature defoliation.",
+    "actions": [
+      "Apply chlorothalonil or mancozeb fungicide every 14 days from 30 days after planting.",
+      "Use resistant groundnut varieties (ICGV series from ICRISAT).",
+      "Rotate with non-legume crops.",
+      "Collect and destroy crop residues.",
+      "Maintain proper spacing and earthing up."
+    ]
+  },
+
+  "groundnut_rosette": {
+    "severity": "high",
+    "title": "Groundnut Rosette Virus",
+    "summary": "Transmitted by aphid Aphis craccivora. Severe stunting, chlorotic or green mosaic; no cure.",
+    "actions": [
+      "Control aphid vector with early insecticide application.",
+      "Use resistant/tolerant varieties (ICGV-SM 99568, RMP-91).",
+      "Plant early — late planting increases aphid pressure.",
+      "Remove and destroy infected plants.",
+      "Use reflective silver mulch to deter aphids."
+    ]
+  },
+
+  "soybean_rust": {
+    "severity": "medium",
+    "title": "Soybean Asian Rust",
+    "summary": "Caused by Phakopsora pachyrhizi. Tan to brown pustules on leaf undersides; can cause 10–80% yield loss.",
+    "actions": [
+      "Apply triazole fungicide (tebuconazole, propiconazole) at first pustule observation.",
+      "Scout regularly especially in the reproductive stages R1–R5.",
+      "Plant early to reduce exposure to late-season epidemic build-up.",
+      "Use partially resistant varieties.",
+      "Avoid planting near volunteer soybeans or alternative hosts."
+    ]
+  },
+
+  "onion_purple_blotch": {
+    "severity": "medium",
+    "title": "Onion Purple Blotch",
+    "summary": "Caused by Alternaria porri. Small, white lesions turning purple with yellow borders.",
+    "actions": [
+      "Apply mancozeb or iprodione fungicide at 10-day intervals.",
+      "Avoid overhead irrigation; use drip or furrow irrigation.",
+      "Space plants adequately to improve air circulation.",
+      "Remove and dispose of infected leaves.",
+      "Use disease-free transplants."
+    ]
+  },
+
+  "cabbage_black_rot": {
+    "severity": "medium",
+    "title": "Cabbage Black Rot",
+    "summary": "Caused by Xanthomonas campestris pv. campestris. V-shaped yellow lesions at leaf margins; black vascular tissue.",
+    "actions": [
+      "Use certified disease-free seed.",
+      "Rotate with non-brassica crops for 2–3 years.",
+      "Apply copper bactericide preventively.",
+      "Avoid irrigation wetting foliage.",
+      "Remove and destroy infected plant material."
+    ]
+  },
+
+  "apple_scab": {
+    "severity": "medium",
+    "title": "Apple Scab",
+    "summary": "Caused by Venturia inaequalis. Olive-green spots on leaves and fruit; distorted, scabby fruit.",
+    "actions": [
+      "Apply captan or myclobutanil fungicide from green tip through petal fall on a 7–10 day cycle.",
+      "Rake and destroy fallen leaves in autumn.",
+      "Prune for good air circulation in canopy.",
+      "Plant scab-resistant varieties (e.g., Topaz, Florina).",
+      "Avoid wetting foliage with irrigation."
+    ]
+  },
+
+  "apple_black_rot": {
+    "severity": "medium",
+    "title": "Apple Black Rot",
+    "summary": "Caused by Botryosphaeria obtusa. Purple spots on leaves, black mummified fruit, cankers on branches.",
+    "actions": [
+      "Remove and destroy mummified fruit and infected branches.",
+      "Apply captan fungicide from pink bud through second cover.",
+      "Prune out dead wood and cankers during dormancy.",
+      "Maintain tree vigour with proper nutrition.",
+      "Avoid wounding; paint pruning cuts."
+    ]
+  },
+
+  "apple_cedar_rust": {
+    "severity": "medium",
+    "title": "Apple Cedar Apple Rust",
+    "summary": "Caused by Gymnosporangium juniperi-virginianae. Orange-yellow spots on leaves; requires juniper alternate host.",
+    "actions": [
+      "Apply myclobutanil or mancozeb fungicide from pink bud through cover sprays.",
+      "Remove nearby juniper/cedar trees (alternate host) if feasible.",
+      "Plant rust-resistant apple varieties.",
+      "Scout in spring for jelly-like orange spore masses on junipers.",
+      "Time fungicide sprays with orange spore release periods."
+    ]
+  },
+
+  "grape_black_rot": {
+    "severity": "high",
+    "title": "Grape Black Rot",
+    "summary": "Caused by Guignardia bidwellii. Tan, circular spots with dark borders on leaves; hard, black shrivelled fruit.",
+    "actions": [
+      "Apply myclobutanil, captan, or mancozeb from bud swell through veraison.",
+      "Remove and destroy mummified berries and infected canes.",
+      "Train vines for good air circulation.",
+      "Scout weekly during cool, wet weather.",
+      "Spray applications critical 2 weeks before and after bloom."
+    ]
+  },
+
+  "grape_esca": {
+    "severity": "high",
+    "title": "Grape Esca / Wood Diseases",
+    "summary": "Complex of wood-decaying fungi (Phaeomoniella, Phaeoacremonium). Tiger-stripe leaves, sudden shoot death.",
+    "actions": [
+      "Prune during dry weather and seal large pruning wounds.",
+      "Remove and destroy infected wood.",
+      "Avoid large pruning cuts; stagger removal over multiple seasons.",
+      "Apply bio-fungicide (Trichoderma) to pruning wounds.",
+      "No fully effective chemical treatment; focus on prevention."
+    ]
+  },
+
+  "grape_leaf_blight": {
+    "severity": "medium",
+    "title": "Grape Leaf Blight (Isariopsis)",
+    "summary": "Caused by Pseudocercospora vitis. Reddish-brown angular spots on upper leaf surface.",
+    "actions": [
+      "Apply copper-based fungicide or mancozeb at first symptom.",
+      "Improve canopy ventilation through shoot positioning and leaf removal.",
+      "Remove infected leaves and dispose away from vineyard.",
+      "Maintain spray coverage on upper and lower leaf surfaces.",
+      "Avoid excessive irrigation."
+    ]
+  },
+
+  "pepper_bacterial_spot": {
+    "severity": "medium",
+    "title": "Pepper Bacterial Spot",
+    "summary": "Caused by Xanthomonas spp. Water-soaked spots on leaves and fruit; yellow halos.",
+    "actions": [
+      "Use certified disease-free seed.",
+      "Apply copper hydroxide bactericide preventively.",
+      "Avoid working in fields when plants are wet.",
+      "Use drip irrigation to keep foliage dry.",
+      "Plant resistant varieties where available."
+    ]
+  },
+
+  "citrus_greening": {
+    "severity": "high",
+    "title": "Citrus Greening (Huanglongbing / HLB)",
+    "summary": "Caused by Candidatus Liberibacter asiaticus; transmitted by Asian citrus psyllid. Blotchy mottle on leaves, green, misshapen fruit.",
+    "actions": [
+      "Control Asian citrus psyllid with systemic insecticides (imidacloprid, thiamethoxam).",
+      "Remove and destroy all infected trees.",
+      "Use certified disease-free nursery trees.",
+      "Never move plant material from HLB-affected areas.",
+      "There is no cure — focus on psyllid control and replanting with clean material."
+    ]
+  },
+
+  "mango_anthracnose": {
+    "severity": "medium",
+    "title": "Mango Anthracnose",
+    "summary": "Caused by Colletotrichum gloeosporioides. Black lesions on leaves, flowers, and fruit; major post-harvest issue.",
+    "actions": [
+      "Apply copper oxychloride or mancozeb at flowering and fruit set.",
+      "Post-harvest hot water treatment (52°C for 5 minutes) to reduce fruit infection.",
+      "Prune for good canopy ventilation.",
+      "Collect and destroy infected plant material.",
+      "Use post-harvest fungicide dip (thiabendazole) for stored fruit."
+    ]
+  },
+
+  "mango_powdery_mildew": {
+    "severity": "medium",
+    "title": "Mango Powdery Mildew",
+    "summary": "Caused by Oidium mangiferae. White powdery coating on flowers, young leaves and fruitlets.",
+    "actions": [
+      "Apply wettable sulfur or triadimefon fungicide at early flowering.",
+      "Spray every 10–14 days during flowering period.",
+      "Prune dead wood and improve canopy ventilation.",
+      "Avoid excessive nitrogen fertilisation.",
+      "Spray when no rain forecast for 24 hours for best coverage."
+    ]
+  },
+
+  "avocado_root_rot": {
+    "severity": "high",
+    "title": "Avocado Root Rot (Phytophthora cinnamomi)",
+    "summary": "The most destructive avocado disease worldwide. Feeder roots turn dark brown; tree yellows and wilts progressively.",
+    "actions": [
+      "Improve soil drainage — plant on raised beds or mounds.",
+      "Apply phosphonate fungicide (potassium phosphonate) as a trunk spray or soil drench.",
+      "Avoid overwatering; install drip irrigation.",
+      "Use rootstocks with partial resistance (Dusa, Bounty).",
+      "Never move soil or plant material from infected orchards."
+    ]
+  },
+
+  "avocado_anthracnose": {
+    "severity": "medium",
+    "title": "Avocado Anthracnose",
+    "summary": "Caused by Colletotrichum gloeosporioides. Post-harvest black sunken lesions on fruit skin.",
+    "actions": [
+      "Apply copper-based fungicide at flowering and during fruit development.",
+      "Post-harvest hot water dip (45–50°C, 10 min) to reduce field latent infections.",
+      "Prune canopy to improve air circulation and light penetration.",
+      "Handle fruit carefully to avoid wounds at harvest.",
+      "Use post-harvest thiabendazole or prochloraz dip."
+    ]
+  },
+
+  "avocado_dieback": {
+    "severity": "medium",
+    "title": "Avocado Stem Canker / Dieback",
+    "summary": "Caused by Botryosphaeria and Phytophthora spp. Dark, sunken cankers on branches; dieback from tips.",
+    "actions": [
+      "Prune and destroy affected branches below the canker margin.",
+      "Paint all pruning cuts with copper-based wound paint.",
+      "Improve tree vigour through balanced nutrition.",
+      "Avoid any stress (drought, waterlogging, pest damage) that predisposes trees.",
+      "Apply phosphonate or copper fungicide to affected areas."
+    ]
+  },
+
+  "tea_blister_blight": {
+    "severity": "high",
+    "title": "Tea Blister Blight",
+    "summary": "Caused by Exobasidium vexans. Small pale blisters on young leaves; severely affects yield of young flushes.",
+    "actions": [
+      "Apply copper-based fungicide (copper oxychloride) every 7–10 days during wet flush seasons.",
+      "Pluck affected leaves and destroy them away from the field.",
+      "Prune for good canopy ventilation.",
+      "Avoid excessive nitrogen fertilisation.",
+      "Plant tolerant clones where available."
+    ]
+  },
+
+  "tea_grey_blight": {
+    "severity": "medium",
+    "title": "Tea Grey Blight",
+    "summary": "Caused by Pestalotiopsis theae. Grey-brown lesions with yellow borders on mature leaves; common in stressed bushes.",
+    "actions": [
+      "Improve soil drainage and nutrition to reduce bush stress.",
+      "Apply copper fungicide at first sign of lesions.",
+      "Remove severely affected leaves.",
+      "Maintain proper pruning cycles.",
+      "Avoid physical injury to leaves during plucking."
+    ]
+  },
+
+  "tea_root_rot": {
+    "severity": "high",
+    "title": "Tea Red Root Rot / Armillaria",
+    "summary": "Caused by Armillaria spp. Yellowing and wilting of bushes; white mycelial sheets under bark of roots.",
+    "actions": [
+      "Uproot and burn infected bushes including all root material.",
+      "Expose root stumps and collar region to sunlight.",
+      "Apply Trichoderma bio-fungicide to soil around affected areas.",
+      "Allow fallow period of 2–3 years before replanting.",
+      "Use certified disease-free planting material."
+    ]
+  },
+
+  "cowpea_mosaic": {
+    "severity": "high",
+    "title": "Cowpea Mosaic Virus (CPMV)",
+    "summary": "Transmitted by aphids and beetles. Mosaic mottling, leaf distortion, and reduced pod fill.",
+    "actions": [
+      "Use certified CPMV-free seed.",
+      "Control insect vectors with insecticides (imidacloprid) at early seedling stage.",
+      "Plant resistant/tolerant cowpea varieties (TVu series).",
+      "Remove and destroy infected plants early.",
+      "Use reflective silver mulch to repel aphid vectors."
+    ]
+  },
+
+  "cowpea_brown_blotch": {
+    "severity": "medium",
+    "title": "Cowpea Brown Blotch",
+    "summary": "Caused by Colletotrichum truncatum. Brown necrotic blotches on leaves and pods; seed discolouration.",
+    "actions": [
+      "Use disease-free certified seed.",
+      "Apply mancozeb or thiram fungicide at first symptom.",
+      "Rotate with non-legume crops.",
+      "Remove and destroy infected crop debris.",
+      "Harvest and dry pods quickly in wet seasons."
+    ]
+  },
+
+  "pigeon_pea_wilt": {
+    "severity": "high",
+    "title": "Pigeon Pea Fusarium Wilt",
+    "summary": "Caused by Fusarium udum. Yellowing and wilting of shoots; brown discolouration of vascular tissue.",
+    "actions": [
+      "Plant Fusarium-resistant varieties (ICPL series from ICRISAT).",
+      "Avoid replanting pigeon pea in infected soil for 3+ years.",
+      "Remove and destroy wilted plants immediately.",
+      "Treat seed with carbendazim or Trichoderma before planting.",
+      "Improve soil drainage — waterlogging worsens the disease."
+    ]
+  },
+
+  "pigeon_pea_sterility": {
+    "severity": "high",
+    "title": "Pigeon Pea Sterility Mosaic Disease",
+    "summary": "Caused by Pigeon Pea Sterility Mosaic Virus (PPSMV), spread by eriophyid mites. Plants become sterile (no pods).",
+    "actions": [
+      "Control eriophyid mite vector with sulfur or abamectin spray.",
+      "Plant resistant/tolerant varieties (ICPL 87119, Asha).",
+      "Rogue infected plants immediately.",
+      "Avoid early planting when mite populations are high.",
+      "Use clean planting material."
+    ]
+  },
+
+  "eggplant_leaf_spot": {
+    "severity": "medium",
+    "title": "Eggplant (Brinjal) Phomopsis Blight",
+    "summary": "Caused by Phomopsis vexans. Circular brown spots on leaves; stem cankers and fruit rot.",
+    "actions": [
+      "Apply mancozeb or copper fungicide every 7–10 days in wet weather.",
+      "Use certified disease-free seed.",
+      "Rotate with non-solanaceous crops.",
+      "Remove and destroy infected plant material.",
+      "Avoid overhead irrigation."
+    ]
+  },
+
+  "eggplant_bacterial_wilt": {
+    "severity": "high",
+    "title": "Eggplant Bacterial Wilt",
+    "summary": "Caused by Ralstonia solanacearum. Rapid wilting without leaf yellowing; white bacterial ooze in cut stems.",
+    "actions": [
+      "Remove and destroy wilted plants immediately — do not compost.",
+      "Avoid waterlogging; improve soil drainage.",
+      "Rotate with non-solanaceous crops for 3–4 years.",
+      "Use grafted seedlings on resistant Solanum rootstocks.",
+      "Sanitise tools with 1% sodium hypochlorite between plants."
+    ]
+  },
+
+  "watermelon_anthracnose": {
+    "severity": "high",
+    "title": "Watermelon Anthracnose",
+    "summary": "Caused by Colletotrichum orbiculare. Dark, sunken lesions on leaves, stem, and fruit; fruit becomes unmarketable.",
+    "actions": [
+      "Apply chlorothalonil or azoxystrobin fungicide preventively.",
+      "Use certified disease-free seed; treat with thiram before planting.",
+      "Rotate cucurbit crops on a 2-year cycle.",
+      "Remove and destroy infected vines and fruit.",
+      "Avoid overhead irrigation."
+    ]
+  },
+
+  "watermelon_gummy_stem_blight": {
+    "severity": "high",
+    "title": "Watermelon Gummy Stem Blight",
+    "summary": "Caused by Didymella bryoniae. Yellow-brown crown lesions oozing gummy exudate; rapid vine death.",
+    "actions": [
+      "Apply thiophanate-methyl or azoxystrobin fungicide at first symptom.",
+      "Use certified disease-free seed.",
+      "Remove and destroy infected plant material.",
+      "Rotate with non-cucurbit crops for 2+ years.",
+      "Avoid injuries to stems at transplanting."
+    ]
+  },
+
+  "sugarcane_smut": {
+    "severity": "high",
+    "title": "Sugarcane Smut",
+    "summary": "Caused by Sporisorium scitamineum. Black whip-like structures replace the growing point; heavily infected fields have >50% loss.",
+    "actions": [
+      "Plant smut-resistant varieties (e.g., N14, NCo 376).",
+      "Use certified disease-free setts for planting.",
+      "Hot-water treat setts (50°C for 30 minutes) before planting.",
+      "Remove and burn smut whips before they rupture and spread spores.",
+      "Rogue heavily infected stools."
+    ]
+  },
+
+  "sugarcane_red_rot": {
+    "severity": "high",
+    "title": "Sugarcane Red Rot",
+    "summary": "Caused by Colletotrichum falcatum. Internal reddening of stalk tissue with white spots; sour fermented smell.",
+    "actions": [
+      "Plant resistant varieties.",
+      "Use disease-free setts; treat with carbendazim fungicide.",
+      "Harvest at maturity — over-mature cane is more susceptible.",
+      "Avoid mechanical damage during harvest and transport.",
+      "Destroy crop debris after harvest."
+    ]
+  },
+
+  "cocoa_black_pod": {
+    "severity": "high",
+    "title": "Cocoa Black Pod Disease",
+    "summary": "Caused by Phytophthora megakarya (West/Central Africa) and P. palmivora. Black, rotting pods; can destroy entire harvest.",
+    "actions": [
+      "Apply copper oxychloride or metalaxyl fungicide every 2–3 weeks during wet season.",
+      "Remove and destroy all infected pods including those on the ground.",
+      "Prune to reduce canopy density and improve air circulation.",
+      "Harvest ripe pods promptly to reduce infection sites.",
+      "Use partially resistant varieties (CCN51, some CRIG clones)."
+    ]
+  },
+
+  "cocoa_swollen_shoot": {
+    "severity": "high",
+    "title": "Cocoa Swollen Shoot Virus (CSSV)",
+    "summary": "Transmitted by mealybugs. Swelling of shoots and roots; red vein-banding on young leaves; death within 2–3 years.",
+    "actions": [
+      "Cut and remove all infected trees including stumps (Cutting Out policy).",
+      "Control mealybug vectors with insecticides.",
+      "Replant with CSSV-tolerant hybrid varieties.",
+      "Establish a buffer zone of 50+ meters around outbreaks.",
+      "Do not transport planting material from affected areas."
+    ]
+  },
+
+  "papaya_ringspot": {
+    "severity": "high",
+    "title": "Papaya Ringspot Virus (PRSV)",
+    "summary": "Aphid-transmitted. Yellow mosaic on leaves, dark green rings on fruit surface; severely reduces marketability.",
+    "actions": [
+      "Plant certified virus-free seedlings from tissue culture.",
+      "Control aphid vectors with mineral oil or insecticides.",
+      "Remove and destroy infected plants immediately.",
+      "Use transgenic PRSV-resistant varieties where available and permitted.",
+      "Establish new orchards far from infected plantations."
+    ]
+  },
+
+  "papaya_anthracnose": {
+    "severity": "medium",
+    "title": "Papaya Anthracnose",
+    "summary": "Caused by Colletotrichum gloeosporioides. Post-harvest circular water-soaked spots that turn brown; serious storage problem.",
+    "actions": [
+      "Apply copper or mancozeb fungicide during fruit development.",
+      "Post-harvest hot water dip (48°C, 20 minutes).",
+      "Handle fruit carefully to avoid wounds.",
+      "Store at 10–13°C to slow disease development.",
+      "Prune for good canopy ventilation."
+    ]
+  },
+
+  "citrus_canker": {
+    "severity": "high",
+    "title": "Citrus Canker",
+    "summary": "Caused by Xanthomonas citri subsp. citri. Raised, corky lesions with water-soaked margins on leaves, twigs and fruit.",
+    "actions": [
+      "Apply copper bactericide (copper hydroxide) preventively.",
+      "Remove and destroy infected leaves and fruit.",
+      "Quarantine infected orchards; do not move plant material.",
+      "Windbreaks reduce spread through rain-splash and wind-driven rain.",
+      "Report to plant health authority — notifiable disease in many countries."
+    ]
+  },
+
+  "citrus_melanose": {
+    "severity": "low",
+    "title": "Citrus Melanose",
+    "summary": "Caused by Diaporthe citri. Small, raised dark-brown spots on leaves and fruit; mainly a cosmetic problem.",
+    "actions": [
+      "Apply copper fungicide preventively before and after rain during young fruit stage.",
+      "Prune dead wood (the primary source of spores).",
+      "Remove pruning debris from orchard.",
+      "Maintain tree vigour through good nutrition.",
+      "Melanose-affected fruit is safe to eat but reduces market value."
+    ]
+  },
+
+  "yam_anthracnose": {
+    "severity": "medium",
+    "title": "Yam Anthracnose",
+    "summary": "Caused by Colletotrichum gloeosporioides. Irregular dark lesions on leaves; premature defoliation reducing tuber yield.",
+    "actions": [
+      "Apply mancozeb or copper fungicide every 2 weeks during vine establishment.",
+      "Use disease-free planting material (seed yam).",
+      "Stake vines to improve air circulation.",
+      "Remove and destroy infected plant parts.",
+      "Avoid wounding tubers during planting."
+    ]
+  },
+
+  "yam_mosaic": {
+    "severity": "high",
+    "title": "Yam Mosaic Virus (YMV)",
+    "summary": "Aphid-transmitted. Mosaic mottling, leaf distortion and stunted plants; tuber yield reduced by 30–60%.",
+    "actions": [
+      "Use certified virus-free seed yam from reputable sources.",
+      "Control aphid vectors with insecticides at emergence.",
+      "Remove and destroy infected plants.",
+      "Avoid replanting from virus-infected fields.",
+      "Use tissue-culture derived planting material where available."
+    ]
+  },
+
+  "taro_leaf_blight": {
+    "severity": "high",
+    "title": "Taro Leaf Blight",
+    "summary": "Caused by Phytophthora colocasiae. Large water-soaked lesions rapidly killing leaves; can collapse entire planting.",
+    "actions": [
+      "Apply metalaxyl-mancozeb or copper fungicide preventively.",
+      "Remove and destroy infected leaves immediately.",
+      "Plant tolerant varieties (e.g., Harosi, Tausala Pink).",
+      "Improve drainage to reduce leaf wetness.",
+      "Space plants for good air circulation."
+    ]
+  },
+
+  "sunflower_downy_mildew": {
+    "severity": "high",
+    "title": "Sunflower Downy Mildew",
+    "summary": "Caused by Plasmopara halstedii. Yellowing of systemically infected seedlings; white downy growth on leaf undersides.",
+    "actions": [
+      "Use metalaxyl seed treatment before planting.",
+      "Plant resistant/tolerant hybrid varieties.",
+      "Rotate with non-sunflower crops for 2+ years.",
+      "Avoid planting in known infected fields.",
+      "Destroy infected plants at first sign."
+    ]
+  },
+
+  "sunflower_rust": {
+    "severity": "medium",
+    "title": "Sunflower Rust",
+    "summary": "Caused by Puccinia helianthi. Rust-coloured pustules on both leaf surfaces; premature leaf death.",
+    "actions": [
+      "Plant resistant hybrid varieties.",
+      "Apply triazole fungicide (tebuconazole) preventively.",
+      "Scout regularly from flowering stage.",
+      "Destroy crop stubble after harvest.",
+      "Rotate with non-host crops."
+    ]
+  },
+
+  "cotton_boll_rot": {
+    "severity": "high",
+    "title": "Cotton Boll Rot",
+    "summary": "Caused by multiple fungi (Fusarium, Rhizoctonia, Phytophthora). Open bolls turn brown and rot; major yield loss.",
+    "actions": [
+      "Control boll weevil and other insects to reduce entry wounds.",
+      "Apply copper or mancozeb fungicide when wet conditions favour infection.",
+      "Harvest bolls promptly when they open.",
+      "Improve field drainage.",
+      "Plant short-season varieties to avoid late-season wet weather."
+    ]
+  },
+
+  "cotton_leaf_curl": {
+    "severity": "high",
+    "title": "Cotton Leaf Curl Virus (CLCuV)",
+    "summary": "Whitefly-transmitted. Upward curling of leaves, dark vein thickening, stunted plants; major problem in South Asia and East Africa.",
+    "actions": [
+      "Control whitefly vector aggressively with imidacloprid or thiamethoxam.",
+      "Plant CLCuV-resistant varieties.",
+      "Use yellow sticky traps to monitor whitefly populations.",
+      "Rogue infected plants early in the season.",
+      "Avoid overlapping cotton seasons (summer-on-summer) which build up virus."
+    ]
+  }
+}

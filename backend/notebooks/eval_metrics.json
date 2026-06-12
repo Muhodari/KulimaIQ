@@ -1,0 +1,16 @@
+{
+  "metrics": {
+    "accuracy": 0.9969,
+    "precision_weighted": 0.9971,
+    "recall_weighted": 0.9969,
+    "f1_weighted": 0.9969,
+    "precision_macro": 0.9971,
+    "recall_macro": 0.9969,
+    "f1_macro": 0.9969,
+    "best_val_acc_from_training": 0.9969,
+    "num_train": 1280,
+    "num_val": 320,
+    "num_classes": 20
+  },
+  "report": "                               precision    recall  f1-score   support\n\n              banana_sigatoka       1.00      1.00      1.00        16\n                  banana_wilt       1.00      1.00      1.00        16\n            bean_angular_spot       1.00      1.00      1.00        16\n                    bean_rust       1.00      1.00      1.00        16\n         cassava_brown_streak       1.00      1.00      1.00        16\n               cassava_mosaic       1.00      1.00      1.00        16\n         coffee_berry_disease       1.00      1.00      1.00        16\n             coffee_leaf_rust       1.00      1.00      1.00        16\n                      healthy       1.00      1.00      1.00        16\n            maize_common_rust       1.00      1.00      1.00        16\n         maize_gray_leaf_spot       1.00      1.00      1.00        16\n               maize_necrosis       1.00      0.94      0.97        16\n          potato_early_blight       1.00      1.00      1.00        16\n           potato_late_blight       1.00      1.00      1.00        16\n                   rice_blast       1.00      1.00      1.00        16\n              rice_brown_spot       1.00      1.00      1.00        16\n          tomato_early_blight       1.00      1.00      1.00        16\n           tomato_late_blight       1.00      1.00      1.00        16\n             tomato_leaf_mold       1.00      1.00      1.00        16\ntomato_yellow_leaf_curl_virus       0.94      1.00      0.97        16\n\n                     accuracy                           1.00       320\n                    macro avg       1.00      1.00      1.00       320\n                 weighted avg       1.00      1.00      1.00       320\n"
+}

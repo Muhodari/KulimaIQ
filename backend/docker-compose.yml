@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  # ── MongoDB ───────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7
+    container_name: kulimaiq_mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-kulimaiq}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-kulimaiq_secret}
+      MONGO_INITDB_DATABASE: kulimaiq
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  # ── FastAPI backend ───────────────────────────────────────────────────────
+  api:
+    build: .
+    container_name: kulimaiq_api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MONGO_URL: mongodb://${MONGO_USERNAME:-kulimaiq}:${MONGO_PASSWORD:-kulimaiq_secret}@mongo:27017/kulimaiq?authSource=admin
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./model_weights:/app/model_weights
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:
