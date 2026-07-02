@@ -56,6 +56,28 @@ class InferenceService:
         return {label: float(probs[i]) for i, label in enumerate(self._classes)}
 
 
+def filter_probs_by_crop(
+    all_probs: dict[str, float], crop: str
+) -> dict[str, float]:
+    """
+    Keep only classes for the selected crop (+ shared healthy), then re-normalize.
+
+    Without this step a multi-crop model can return e.g. tomato_late_blight when
+    the user scanned cassava leaves with crop=cassava.
+    """
+    filtered = {
+        label: prob
+        for label, prob in all_probs.items()
+        if label == "healthy" or label.startswith(f"{crop}_")
+    }
+    if not filtered:
+        return {}
+    total = sum(filtered.values())
+    if total <= 0:
+        return filtered
+    return {label: prob / total for label, prob in filtered.items()}
+
+
 # ── Module-level singleton ────────────────────────────────────────────────────
 
 _service: Optional[InferenceService] = None

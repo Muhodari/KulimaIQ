@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:sqflite/sqflite.dart';
 
 import '../../domain/models/crop_type.dart';
@@ -53,8 +55,18 @@ class DiagnosisRepository {
       createdAt: DateTime.now(),
       isOffline: isOffline,
       recommendation: output.recommendation,
+      severity: output.severity,
+      actions: output.actions,
+      likelyDiseases: output.likelyDiseases
+          .map(
+            (d) => LikelyDiagnosis(
+              label: d.label,
+              confidence: d.confidence,
+            ),
+          )
+          .toList(),
     );
-    await _save(result);
+    await _save(result, farmId: farmId);
     return result;
   }
 
@@ -126,17 +138,34 @@ class DiagnosisRepository {
           'is_offline': 0,
           'recommendation': bd.recommendation,
           'recommendation_key': null,
+          'severity': bd.severity,
+          'actions_json':
+              bd.actions.isEmpty ? null : jsonEncode(bd.actions),
         },
         // IGNORE keeps the local record (with real image path) if already saved.
         conflictAlgorithm: ConflictAlgorithm.ignore,
       );
     }
     await batch.commit(noResult: true, continueOnError: true);
+    // Back-fill treatment fields from backend without overwriting local images.
+    for (final bd in remote) {
+      await db.update(
+        'diagnoses',
+        {
+          'recommendation': bd.recommendation,
+          'severity': bd.severity,
+          'actions_json':
+              bd.actions.isEmpty ? null : jsonEncode(bd.actions),
+        },
+        where: 'id = ?',
+        whereArgs: [bd.id],
+      );
+    }
   }
 
   // ── Persistence ────────────────────────────────────────────────────────────
 
-  Future<void> _save(DiagnosisResult result) async {
+  Future<void> _save(DiagnosisResult result, {String? farmId}) async {
     final db = await _databaseService.database;
     await db.insert(
       'diagnoses',
@@ -146,11 +175,14 @@ class DiagnosisRepository {
         'disease': result.rawDiseaseLabel,
         'confidence': result.confidence,
         'image_path': result.imagePath,
-        'farm_id': null,
+        'farm_id': farmId,
         'created_at': result.createdAt.millisecondsSinceEpoch,
         'is_offline': result.isOffline ? 1 : 0,
         'recommendation_key': result.recommendationKey,
         'recommendation': result.recommendation,
+        'severity': result.severity,
+        'actions_json':
+            result.actions.isEmpty ? null : jsonEncode(result.actions),
       },
       // REPLACE so re-scanning the same image (same backend UUID) updates
       // the local record with the real image path instead of throwing.
@@ -165,6 +197,14 @@ class DiagnosisRepository {
         ? false
         : (isOfflineRaw is int ? isOfflineRaw == 1 : isOfflineRaw == true);
 
+    final actionsRaw = row['actions_json'] as String?;
+    List<String> actions = const [];
+    if (actionsRaw != null && actionsRaw.isNotEmpty) {
+      try {
+        actions = List<String>.from(jsonDecode(actionsRaw) as List);
+      } catch (_) {}
+    }
+
     return DiagnosisResult(
       id: row['id']! as String,
       crop: CropType.fromId(row['crop'] as String?) ?? CropType.cassava,
@@ -178,6 +218,9 @@ class DiagnosisRepository {
       isOffline: isOffline,
       recommendation: row['recommendation'] as String?,
       recommendationKey: row['recommendation_key'] as String?,
+      severity: row['severity'] as String?,
+      actions: actions,
+      likelyDiseases: const [],
     );
   }
 }

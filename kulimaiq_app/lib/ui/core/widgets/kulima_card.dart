@@ -28,7 +28,10 @@ class KulimaCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.surfaceCard,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppTheme.border),
+        border: Border.all(
+          color: accentColor?.withValues(alpha: 0.28) ?? AppTheme.border,
+          width: accentColor != null ? 1.5 : 1,
+        ),
         boxShadow: [AppTheme.cardShadow],
       ),
       child: accentColor != null

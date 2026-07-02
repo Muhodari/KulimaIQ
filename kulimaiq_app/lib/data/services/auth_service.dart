@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../domain/models/auth_user.dart';
+import 'api_logger.dart';
 import 'backend_api_service.dart';
 import 'database_service.dart';
 import 'preferences_service.dart';
@@ -41,6 +42,14 @@ class AuthService {
         displayName: demoName,
       );
     }
+
+    // Mirror demo account on the backend so login returns a JWT for farm sync.
+    final backendUser =
+        await _backendApiService.login(demoPhone, demoPassword);
+    if (backendUser == null) {
+      await _backendApiService.register(demoPhone, demoPassword, demoName);
+      await _backendApiService.login(demoPhone, demoPassword);
+    }
   }
 
   /// Login: tries backend first, falls back to local SQLite.
@@ -67,7 +76,31 @@ class AuthService {
       return user;
     }
 
-    // 2. Fall back to local SQLite (covers demo account + offline)
+    ApiLogger.info(
+      'Backend login unavailable — using local account for ${phone.trim()}',
+    );
+
+    // Demo credentials: ensure backend account exists, then retry for a JWT.
+    if (phone.trim() == demoPhone && password == demoPassword) {
+      await _backendApiService.register(demoPhone, demoPassword, demoName);
+      final retry = await _backendApiService.login(demoPhone, demoPassword);
+      if (retry != null) {
+        final user = AuthUser(
+          id: retry.userId,
+          phone: retry.phone,
+          displayName: retry.displayName,
+        );
+        await _preferencesService.saveSession(
+          userId: user.id,
+          phone: user.phone,
+          displayName: user.displayName,
+        );
+        await _upsertLocalUser(user: user, password: password);
+        ApiLogger.info('Backend demo account linked after retry');
+        return user;
+      }
+    }
+
     return _localLogin(phone: phone, password: password);
   }
 
@@ -106,7 +139,7 @@ class AuthService {
       return user;
     }
 
-    // 2. Fall back to local-only registration
+    ApiLogger.info('Backend register unavailable — creating local account only');
     return _localRegister(
         phone: normalizedPhone, password: password, displayName: displayName);
   }
@@ -119,6 +152,25 @@ class AuthService {
       phone: session.phone,
       displayName: session.displayName,
     );
+  }
+
+  /// If the user is signed in locally but has no backend JWT, log in again.
+  Future<void> refreshBackendSession() async {
+    final user = await getCurrentUser();
+    if (user == null) return;
+    if (await _backendApiService.getToken() != null) return;
+
+    if (user.phone == demoPhone) {
+      ApiLogger.info('Restoring backend JWT for demo account');
+      var result = await _backendApiService.login(demoPhone, demoPassword);
+      if (result == null) {
+        await _backendApiService.register(demoPhone, demoPassword, demoName);
+        result = await _backendApiService.login(demoPhone, demoPassword);
+      }
+      if (result != null) {
+        ApiLogger.info('Backend session restored');
+      }
+    }
   }
 
   Future<void> logout() async {

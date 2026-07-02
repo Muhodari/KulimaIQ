@@ -139,60 +139,7 @@ enum CropType {
     }
   }
 
-  /// Colour used in the crop picker tile background.
-  Color get color {
-    switch (this) {
-      case CropType.cassava:      return const Color(0xFFE8F5E9);
-      case CropType.maize:        return const Color(0xFFFFF8E1);
-      case CropType.banana:       return const Color(0xFFFFF9C4);
-      case CropType.bean:         return const Color(0xFFE8F5E9);
-      case CropType.sweetPotato:  return const Color(0xFFFCE4EC);
-      case CropType.sorghum:      return const Color(0xFFFFF3E0);
-      case CropType.groundnut:    return const Color(0xFFF3E5F5);
-      case CropType.cowpea:       return const Color(0xFFE8F5E9);
-      case CropType.pigeonPea:    return const Color(0xFFF1F8E9);
-      case CropType.yam:          return const Color(0xFFFFF3E0);
-      case CropType.taro:         return const Color(0xFFE8F5E9);
-      case CropType.tomato:       return const Color(0xFFFFEBEE);
-      case CropType.potato:       return const Color(0xFFF5F5F5);
-      case CropType.onion:        return const Color(0xFFE8EAF6);
-      case CropType.pepper:       return const Color(0xFFFFEBEE);
-      case CropType.eggplant:     return const Color(0xFFEDE7F6);
-      case CropType.cabbage:      return const Color(0xFFE8F5E9);
-      case CropType.spinach:      return const Color(0xFFE8F5E9);
-      case CropType.carrot:       return const Color(0xFFFFF3E0);
-      case CropType.cucumber:     return const Color(0xFFF1F8E9);
-      case CropType.watermelon:   return const Color(0xFFFFEBEE);
-      case CropType.pumpkin:      return const Color(0xFFFFF3E0);
-      case CropType.garlic:       return const Color(0xFFF5F5F5);
-      case CropType.coffee:       return const Color(0xFFEFEBE9);
-      case CropType.tea:          return const Color(0xFFE8F5E9);
-      case CropType.cocoa:        return const Color(0xFFEFEBE9);
-      case CropType.sugarcane:    return const Color(0xFFF1F8E9);
-      case CropType.rice:         return const Color(0xFFF1F8E9);
-      case CropType.wheat:        return const Color(0xFFFFFDE7);
-      case CropType.soybean:      return const Color(0xFFE8F5E9);
-      case CropType.sunflower:    return const Color(0xFFFFF9C4);
-      case CropType.sesame:       return const Color(0xFFFFF8E1);
-      case CropType.cotton:       return const Color(0xFFF5F5F5);
-      case CropType.mango:        return const Color(0xFFFFF9C4);
-      case CropType.avocado:      return const Color(0xFFDCEDC8);
-      case CropType.pineapple:    return const Color(0xFFFFF9C4);
-      case CropType.passionFruit: return const Color(0xFFEDE7F6);
-      case CropType.papaya:       return const Color(0xFFFFF3E0);
-      case CropType.orange:       return const Color(0xFFFFF3E0);
-      case CropType.lemon:        return const Color(0xFFFFFDE7);
-      case CropType.apple:        return const Color(0xFFFFEBEE);
-      case CropType.grape:        return const Color(0xFFEDE7F6);
-      case CropType.peach:        return const Color(0xFFFCE4EC);
-      case CropType.cherry:       return const Color(0xFFFFEBEE);
-      case CropType.strawberry:   return const Color(0xFFFFEBEE);
-      case CropType.blueberry:    return const Color(0xFFE3F2FD);
-      case CropType.raspberry:    return const Color(0xFFFCE4EC);
-      case CropType.macadamia:    return const Color(0xFFF5F5F5);
-      case CropType.squash:       return const Color(0xFFFFF3E0);
-      case CropType.lentil:       return const Color(0xFFF3E5F5);
-      case CropType.chickpea:     return const Color(0xFFFFF8E1);
-    }
-  }
+  /// Uniform soft green tint for crop chips and tiles (matches app brand).
+  static const Color _chipTint = Color(0xFFE8F3EB);
+  Color get color => _chipTint;
 }

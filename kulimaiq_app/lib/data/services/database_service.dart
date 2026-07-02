@@ -5,7 +5,7 @@ class DatabaseService {
   DatabaseService();
 
   static const _dbName = 'kulimaiq.db';
-  static const _dbVersion = 6;
+  static const _dbVersion = 7;
 
   Database? _database;
 
@@ -48,6 +48,9 @@ class DatabaseService {
     if (oldVersion < 6) {
       await _addRecommendationColumn(db);
     }
+    if (oldVersion < 7) {
+      await _addDiagnosisTreatmentColumns(db);
+    }
   }
 
   Future<void> _createCoreTables(Database db) async {
@@ -61,7 +64,9 @@ class DatabaseService {
         created_at INTEGER NOT NULL,
         is_offline INTEGER NOT NULL,
         recommendation_key TEXT,
-        recommendation TEXT
+        recommendation TEXT,
+        severity TEXT,
+        actions_json TEXT
       )
     ''');
     await db.execute('''
@@ -160,5 +165,17 @@ class DatabaseService {
     try {
       await db.execute('ALTER TABLE diagnoses ADD COLUMN recommendation TEXT');
     } catch (_) {}
+  }
+
+  /// v7: persist treatment severity and action steps from scan results.
+  Future<void> _addDiagnosisTreatmentColumns(Database db) async {
+    for (final ddl in [
+      'ALTER TABLE diagnoses ADD COLUMN severity TEXT',
+      'ALTER TABLE diagnoses ADD COLUMN actions_json TEXT',
+    ]) {
+      try {
+        await db.execute(ddl);
+      } catch (_) {}
+    }
   }
 }

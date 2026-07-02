@@ -5,6 +5,7 @@ import '../../../../data/repositories/diagnosis_repository.dart';
 import '../../../../data/services/image_capture_service.dart';
 import '../../../../domain/models/crop_type.dart';
 import '../../../../domain/models/diagnosis_result.dart';
+import '../../../../domain/models/farm.dart';
 import '../../../../l10n/app_strings.dart';
 
 class ScanViewModel extends ChangeNotifier {
@@ -24,6 +25,9 @@ class ScanViewModel extends ChangeNotifier {
 
   CropType _selectedCrop = CropType.cassava;
   String? _imagePath;
+  String? _farmId;
+  String? _farmName;
+  List<CropType>? _farmCrops;
   DiagnosisResult? _result;
   bool _analyzing = false;
   bool _loadingCapabilities = true;
@@ -32,6 +36,11 @@ class ScanViewModel extends ChangeNotifier {
 
   CropType get selectedCrop => _selectedCrop;
   String? get imagePath => _imagePath;
+  String? get farmId => _farmId;
+  String? get farmName => _farmName;
+  List<CropType>? get farmCrops => _farmCrops;
+  bool get isFarmScan => _farmId != null;
+  bool get hasFarmCrops => _farmCrops != null && _farmCrops!.isNotEmpty;
   DiagnosisResult? get result => _result;
   bool get analyzing => _analyzing;
   bool get loadingCapabilities => _loadingCapabilities;
@@ -52,8 +61,29 @@ class ScanViewModel extends ChangeNotifier {
   }
 
   void selectCrop(CropType crop) {
+    if (_farmCrops != null && !_farmCrops!.contains(crop)) return;
     _selectedCrop = crop;
     _result = null;
+    notifyListeners();
+  }
+
+  void beginFarmScan(Farm farm) {
+    _farmId = farm.id;
+    _farmName = farm.name;
+    _farmCrops = List<CropType>.from(farm.crops);
+    if (_farmCrops!.isNotEmpty) {
+      _selectedCrop = _farmCrops!.first;
+    }
+    _imagePath = null;
+    _result = null;
+    _error = null;
+    notifyListeners();
+  }
+
+  void clearFarmContext() {
+    _farmId = null;
+    _farmName = null;
+    _farmCrops = null;
     notifyListeners();
   }
 
@@ -108,6 +138,7 @@ class ScanViewModel extends ChangeNotifier {
       _result = await _diagnosisRepository.diagnose(
         imagePath: _imagePath!,
         crop: _selectedCrop,
+        farmId: _farmId,
       );
     } catch (_) {
       _error = _strings.t('error_generic');
@@ -117,10 +148,26 @@ class ScanViewModel extends ChangeNotifier {
     }
   }
 
+  void clearResult() {
+    _result = null;
+    _error = null;
+    notifyListeners();
+  }
+
+  void startNewScan() {
+    _imagePath = null;
+    _result = null;
+    _error = null;
+    notifyListeners();
+  }
+
   void reset() {
     _imagePath = null;
     _result = null;
     _error = null;
+    _farmId = null;
+    _farmName = null;
+    _farmCrops = null;
     notifyListeners();
   }
 }

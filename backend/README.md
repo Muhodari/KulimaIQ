@@ -41,9 +41,12 @@ Jupyter notebook for documentation, EDA, architecture, metrics, and deployment:
 ```bash
 cd backend
 source .venv/bin/activate
-pip install matplotlib seaborn scikit-learn jupyter
+pip install -r requirements.txt matplotlib seaborn scikit-learn jupyter ipykernel
+python -m ipykernel install --user --name=kulimaiq --display-name="KulimaIQ (backend .venv)"
 jupyter notebook notebooks/KulimaIQ_Model_Notebook.ipynb
 ```
+
+In Jupyter or VS Code, select the **KulimaIQ (backend .venv)** kernel.
 
 The notebook covers:
 - Data visualizations (class distribution, sample images, crop×disease matrix)

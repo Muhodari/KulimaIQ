@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import '../../../../domain/models/crop_type.dart';
 import '../../../../domain/models/farm.dart';
-import '../../../../domain/models/farm_weather.dart';
 import '../../../../l10n/app_strings.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
@@ -12,6 +11,7 @@ import '../../../core/widgets/empty_state.dart';
 import '../../../core/widgets/kulima_card.dart';
 import '../../../core/widgets/section_header.dart';
 import '../view_models/farm_view_model.dart';
+import 'farm_detail_page.dart';
 import 'farm_form_sheet.dart';
 
 class FarmsView extends StatefulWidget {
@@ -31,40 +31,26 @@ class _FarmsViewState extends State<FarmsView> {
   }
 
   void _openAddSheet() {
+    final vm = context.read<FarmViewModel>();
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const FarmFormSheet(),
+      builder: (_) => ChangeNotifierProvider.value(
+        value: vm,
+        child: const FarmFormSheet(),
+      ),
     );
   }
 
-  List<Widget> _buildGroupedFarms(FarmViewModel vm) {
-    final widgets = <Widget>[];
-    final grouped = vm.farmsByCountry;
-    for (final country in vm.activeCountries) {
-      final farmsInCountry = grouped[country]!;
-      widgets.add(
+  List<Widget> _buildFarmList(FarmViewModel vm) {
+    return [
+      for (final farm in vm.farms)
         Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-          child: _CountryHeader(country: country),
+          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+          child: _FarmCard(farm: farm, vm: vm),
         ),
-      );
-      for (final farm in farmsInCountry) {
-        widgets.add(
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: _FarmCard(
-              farm: farm,
-              vm: vm,
-              weather: vm.weatherFor(farm.id),
-            ),
-          ),
-        );
-      }
-      widgets.add(const SizedBox(height: AppSpacing.md));
-    }
-    return widgets;
+    ];
   }
 
   @override
@@ -75,49 +61,57 @@ class _FarmsViewState extends State<FarmsView> {
     return ListenableBuilder(
       listenable: vm,
       builder: (context, _) {
-        return Scaffold(
-          backgroundColor: AppTheme.surface,
-          floatingActionButton: FloatingActionButton.extended(
-            onPressed: _openAddSheet,
-            backgroundColor: AppTheme.primary,
-            foregroundColor: Colors.white,
-            icon: const Icon(Icons.add_rounded),
-            label: Text(s.t('farm_add')),
-          ),
-          body: vm.loading
-              ? const Center(child: CircularProgressIndicator())
-              : RefreshIndicator(
-                  color: AppTheme.primary,
-                  onRefresh: vm.load,
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.screenPadding,
-                      AppSpacing.screenPadding,
-                      AppSpacing.screenPadding,
-                      100,
-                    ),
-                    children: [
-                      _OverallHealthCard(vm: vm),
-                      const SizedBox(height: AppSpacing.xxl),
-                      SectionHeader(
-                        title: s.t('farm_list_title'),
-                        subtitle: s.t('farm_list_subtitle'),
+        return Stack(
+          children: [
+            vm.loading
+                ? const Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    color: AppTheme.primary,
+                    onRefresh: vm.load,
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.screenPadding,
+                        AppSpacing.screenPadding,
+                        AppSpacing.screenPadding,
+                        100,
                       ),
-                      if (vm.error != null)
-                        Text(vm.error!,
-                            style: const TextStyle(color: AppTheme.error))
-                      else if (vm.farms.isEmpty)
-                        EmptyState(
-                          icon: Icons.landscape_outlined,
-                          message: s.t('farm_empty'),
-                          actionLabel: s.t('farm_add'),
-                          onAction: _openAddSheet,
-                        )
-                      else
-                        ..._buildGroupedFarms(vm),
-                    ],
+                      children: [
+                        SectionHeader(
+                          title: s.t('farm_list_title'),
+                          subtitle: s.t('farm_list_subtitle'),
+                        ),
+                        if (!vm.loading && vm.farms.isNotEmpty) ...[
+                          _OverallHealthCard(vm: vm),
+                          const SizedBox(height: AppSpacing.xxl),
+                        ],
+                        if (vm.error != null)
+                          Text(vm.error!,
+                              style: const TextStyle(color: AppTheme.error))
+                        else if (vm.farms.isEmpty)
+                          EmptyState(
+                            icon: Icons.landscape_outlined,
+                            message: s.t('farm_empty'),
+                            actionLabel: s.t('farm_add'),
+                            onAction: _openAddSheet,
+                          )
+                        else
+                          ..._buildFarmList(vm),
+                      ],
+                    ),
                   ),
-                ),
+            Positioned(
+              right: AppSpacing.screenPadding,
+              bottom: AppSpacing.lg,
+              child: FloatingActionButton.extended(
+                onPressed: _openAddSheet,
+                backgroundColor: AppTheme.primary,
+                foregroundColor: AppTheme.textOnDark,
+                elevation: 4,
+                icon: const Icon(Icons.add_rounded),
+                label: Text(s.t('farm_add')),
+              ),
+            ),
+          ],
         );
       },
     );
@@ -211,13 +205,11 @@ class _OverallHealthCard extends StatelessWidget {
               _StatBadge(
                 label: s.t('farm_stat_healthy'),
                 value: '${vm.healthyCount}',
-                color: Colors.greenAccent.shade400,
               ),
               const SizedBox(width: AppSpacing.md),
               _StatBadge(
                 label: s.t('farm_stat_at_risk'),
                 value: '${vm.atRiskCount}',
-                color: Colors.orange.shade300,
               ),
             ],
           ),
@@ -227,10 +219,8 @@ class _OverallHealthCard extends StatelessWidget {
   }
 
   Color _scoreColor(double? score) {
-    if (score == null) return Colors.grey;
-    if (score >= 75) return Colors.greenAccent.shade400;
-    if (score >= 50) return Colors.orange;
-    return Colors.redAccent;
+    if (score == null) return AppTheme.textSecondary;
+    return AppTheme.scoreColor(score);
   }
 
   String _scoreLabel(double score, dynamic s) {
@@ -276,10 +266,9 @@ class _CircleScore extends StatelessWidget {
 }
 
 class _StatBadge extends StatelessWidget {
-  const _StatBadge({required this.label, required this.value, this.color});
+  const _StatBadge({required this.label, required this.value});
   final String label;
   final String value;
-  final Color? color;
 
   @override
   Widget build(BuildContext context) {
@@ -296,8 +285,8 @@ class _StatBadge extends StatelessWidget {
         children: [
           Text(
             value,
-            style: TextStyle(
-              color: color ?? Colors.white,
+            style: const TextStyle(
+              color: Colors.white,
               fontWeight: FontWeight.w800,
               fontSize: 20,
             ),
@@ -312,66 +301,15 @@ class _StatBadge extends StatelessWidget {
   }
 }
 
-// ── Country section header ────────────────────────────────────────────────────
-
-class _CountryHeader extends StatelessWidget {
-  const _CountryHeader({required this.country});
-  final String country;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 20,
-          decoration: BoxDecoration(
-            color: AppTheme.primary,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.xs,
-          ),
-          decoration: BoxDecoration(
-            color: AppTheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.public_rounded, size: 14, color: AppTheme.primary),
-              const SizedBox(width: 4),
-              Text(
-                country,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.primary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 // ── Farm card ────────────────────────────────────────────────────────────────
 
 class _FarmCard extends StatelessWidget {
   const _FarmCard({
     required this.farm,
     required this.vm,
-    this.weather,
   });
   final Farm farm;
   final FarmViewModel vm;
-  final FarmWeather? weather;
 
   @override
   Widget build(BuildContext context) {
@@ -401,62 +339,15 @@ class _FarmCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.lg),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      farm.name,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    if (farm.locationDisplay.isNotEmpty)
-                      Text(
-                        farm.locationDisplay,
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                  ],
+                child: Text(
+                  farm.name,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
               if (farm.healthScore != null)
                 _ScorePill(score: farm.healthScore!, color: statusColor),
             ],
           ),
-          // ── Weather strip ─────────────────────────────────────────────
-          if (weather != null) ...[
-            const SizedBox(height: AppSpacing.md),
-            _WeatherStrip(weather: weather!),
-          ] else if (farm.hasCoordinates) ...[
-            const SizedBox(height: AppSpacing.sm),
-            Row(
-              children: [
-                Icon(Icons.cloud_off_rounded,
-                    size: 13, color: AppTheme.textSecondary),
-                const SizedBox(width: 4),
-                Text(
-                  s.t('farm_weather_offline'),
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ] else ...[
-            const SizedBox(height: AppSpacing.sm),
-            Row(
-              children: [
-                Icon(Icons.location_off_outlined,
-                    size: 13, color: AppTheme.textSecondary),
-                const SizedBox(width: 4),
-                Text(
-                  s.t('farm_no_gps'),
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ],
           const SizedBox(height: AppSpacing.lg),
           Wrap(
             spacing: AppSpacing.sm,
@@ -494,18 +385,17 @@ class _FarmCard extends StatelessWidget {
   }
 
   void _showDetail(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => FarmFormSheet(farm: farm),
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => FarmDetailPage(farm: farm),
+      ),
     );
   }
 
   Color _statusColor(FarmHealthStatus status) {
     switch (status) {
       case FarmHealthStatus.healthy:
-        return AppTheme.success;
+        return AppTheme.primary;
       case FarmHealthStatus.atRisk:
         return AppTheme.warning;
       case FarmHealthStatus.diseased:
@@ -516,67 +406,6 @@ class _FarmCard extends StatelessWidget {
   }
 
   IconData _cropIcon(CropType crop) => crop.icon;
-}
-
-// ── Weather strip ─────────────────────────────────────────────────────────────
-
-class _WeatherStrip extends StatelessWidget {
-  const _WeatherStrip({required this.weather});
-  final FarmWeather weather;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0369A1).withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-      ),
-      child: Row(
-        children: [
-          Icon(weather.icon, size: 18, color: const Color(0xFF0369A1)),
-          const SizedBox(width: AppSpacing.sm),
-          Text(
-            '${weather.temperatureC.toStringAsFixed(1)}°C',
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 14,
-              color: Color(0xFF0369A1),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              weather.description,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF0369A1),
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.air_rounded,
-                  size: 13, color: const Color(0xFF0369A1).withValues(alpha: 0.6)),
-              const SizedBox(width: 2),
-              Text(
-                '${weather.windspeedKmh.toStringAsFixed(0)} km/h',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: const Color(0xFF0369A1).withValues(alpha: 0.8),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // ── Shared small widgets ──────────────────────────────────────────────────────
@@ -621,7 +450,7 @@ class _StatusChip extends StatelessWidget {
     switch (status) {
       case FarmHealthStatus.healthy:
         key = 'farm_status_healthy';
-        color = AppTheme.success;
+        color = AppTheme.primary;
       case FarmHealthStatus.atRisk:
         key = 'farm_status_at_risk';
         color = AppTheme.warning;

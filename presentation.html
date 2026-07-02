@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KulimaIQ — Presentation</title>
+  <style>
+    :root {
+      --green-900: #1B4332;
+      --green-700: #2D6A4F;
+      --green-500: #40916C;
+      --green-300: #74C69D;
+      --green-100: #E8F3EB;
+      --cream: #FAFBF8;
+      --text: #1a1a1a;
+      --muted: #5a6b62;
+      --white: #ffffff;
+      --accent: #D4A574;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--green-900);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .deck {
+      height: 100vh;
+      position: relative;
+    }
+
+    .slide {
+      display: none;
+      height: 100vh;
+      padding: 3rem 4rem 5rem;
+      overflow-y: auto;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .slide.active { display: flex; flex-direction: column; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Title slide */
+    .slide.title-slide {
+      background: linear-gradient(135deg, var(--green-900) 0%, var(--green-700) 50%, var(--green-500) 100%);
+      color: var(--white);
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .slide.title-slide h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .slide.title-slide .tagline {
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      opacity: 0.92;
+      max-width: 720px;
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .slide.title-slide .meta {
+      font-size: 0.95rem;
+      opacity: 0.8;
+      line-height: 1.8;
+    }
+
+    .leaf-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+    }
+
+    /* Content slides */
+    .slide.content-slide {
+      background: var(--cream);
+    }
+
+    .slide-header {
+      margin-bottom: 1.75rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 3px solid var(--green-500);
+    }
+
+    .slide-header h2 {
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      color: var(--green-900);
+      font-weight: 700;
+    }
+
+    .slide-header .slide-num {
+      font-size: 0.8rem;
+      color: var(--green-500);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.25rem;
+    }
+
+    .slide-body {
+      flex: 1;
+      font-size: 1.05rem;
+      line-height: 1.65;
+      color: var(--text);
+    }
+
+    .slide-body p { margin-bottom: 1rem; }
+
+    .slide-body ul, .slide-body ol {
+      margin: 0.5rem 0 1rem 1.5rem;
+    }
+
+    .slide-body li { margin-bottom: 0.4rem; }
+
+    .highlight-box {
+      background: var(--green-100);
+      border-left: 4px solid var(--green-500);
+      padding: 1rem 1.25rem;
+      border-radius: 0 8px 8px 0;
+      margin: 1rem 0;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .stat-card {
+      background: var(--white);
+      border: 1px solid #dde8e2;
+      border-radius: 12px;
+      padding: 1.25rem;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(27,67,50,0.06);
+    }
+
+    .stat-card .value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--green-700);
+    }
+
+    .stat-card .label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+      background: var(--white);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(27,67,50,0.06);
+    }
+
+    th, td {
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid #e8efe9;
+    }
+
+    th {
+      background: var(--green-700);
+      color: var(--white);
+      font-weight: 600;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:nth-child(even) { background: #f6faf7; }
+
+    .compare-win {
+      color: var(--green-700);
+      font-weight: 600;
+    }
+
+    .architecture {
+      font-family: "SF Mono", "Consolas", monospace;
+      font-size: 0.78rem;
+      background: var(--green-900);
+      color: #a8d5ba;
+      padding: 1.25rem;
+      border-radius: 10px;
+      line-height: 1.5;
+      white-space: pre;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .slide { padding: 2rem 1.5rem 4rem; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    /* Navigation */
+    .nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(27, 67, 50, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      color: var(--white);
+    }
+
+    .nav button {
+      background: var(--green-500);
+      color: var(--white);
+      border: none;
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .nav button:hover { background: var(--green-300); color: var(--green-900); }
+    .nav button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .progress {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .kbd {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      margin: 0 0.15rem;
+    }
+
+    .closing-slide {
+      background: linear-gradient(135deg, var(--green-700), var(--green-500));
+      color: var(--white);
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .closing-slide h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .closing-slide p { font-size: 1.2rem; opacity: 0.95; }
+  </style>
+</head>
+<body>
+  <div class="deck" id="deck">
+
+    <!-- Slide 1: Title -->
+    <section class="slide title-slide active" data-slide="1">
+      <div class="leaf-icon">🌿</div>
+      <h1>KulimaIQ</h1>
+      <p class="tagline">Machine Learning-Powered Mobile Agricultural Intelligence for Smallholder Farmers in Eastern Africa</p>
+      <p class="meta">
+        <strong>Sage Muhodari</strong><br>
+        African Leadership University — BSc Software Engineering<br>
+        Supervisor: Emmanuel Adjei<br>
+        Pilot: Byumba Sector, Northern Province, Rwanda
+      </p>
+    </section>
+
+    <!-- Slide 2: Problem -->
+    <section class="slide content-slide" data-slide="2">
+      <div class="slide-header">
+        <div class="slide-num">Slide 2</div>
+        <h2>Problem Statement</h2>
+      </div>
+      <div class="slide-body">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="value">20–40%</div><div class="label">Global crop yield lost to pests & disease</div></div>
+          <div class="stat-card"><div class="value">CMD · MLN · BXW</div><div class="label">Major threats in Rwanda</div></div>
+          <div class="stat-card"><div class="value">Slow</div><div class="label">Extension officer reach</div></div>
+        </div>
+        <p><strong>Smallholder farmers</strong> lose harvests because diseases are identified too late, treatment is guesswork, and expert advice is scarce.</p>
+        <div class="highlight-box">
+          <strong>Research gap:</strong> No integrated, low-bandwidth tool combines CNN disease detection + farm GPS + localized weather + offline use for Rwandan smallholders.
+        </div>
+        <ul>
+          <li>Late identification → disease spreads plot to plot</li>
+          <li>Wrong chemicals → wasted money and environmental harm</li>
+          <li>Climate change → rising disease pressure</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Slide 3: Objectives -->
+    <section class="slide content-slide" data-slide="3">
+      <div class="slide-header">
+        <div class="slide-num">Slide 3</div>
+        <h2>Research Objectives</h2>
+      </div>
+      <div class="slide-body">
+        <p><strong>Main objective:</strong> Design, develop, and pilot KulimaIQ — a mobile platform for early CNN-based crop disease detection.</p>
+        <ol>
+          <li>Literature review + farmer insights in Byumba Sector</li>
+          <li>Build prototype: CNN + farms + climate advisories (<strong>≥80% accuracy</strong> target)</li>
+          <li>Pilot with <strong>30–50 farmers</strong> for 3 months; target <strong>≥15% reduction</strong> in delayed disease response</li>
+        </ol>
+        <p><strong>Research questions:</strong></p>
+        <ul>
+          <li>Can a CNN detect prevalent diseases from real farmer leaf images?</li>
+          <li>Do climate advisories improve planting and disease decisions?</li>
+          <li>What usability factors affect adoption in Byumba?</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Slide 4: Innovation -->
+    <section class="slide content-slide" data-slide="4">
+      <div class="slide-header">
+        <div class="slide-num">Slide 4</div>
+        <h2>Innovation vs Existing Solutions</h2>
+      </div>
+      <div class="slide-body">
+        <table>
+          <thead>
+            <tr><th>Solution</th><th>Strength</th><th>Gap</th><th>KulimaIQ</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>PlantVillage / Nuru</td>
+              <td>Offline CNN; East Africa validated</td>
+              <td>Cassava-focused; no farm + weather</td>
+              <td class="compare-win">Multi-crop + integrated platform</td>
+            </tr>
+            <tr>
+              <td>iCow</td>
+              <td>SMS on basic phones</td>
+              <td>No image/ML diagnosis</td>
+              <td class="compare-win">Photo-based AI diagnosis</td>
+            </tr>
+            <tr>
+              <td>Agromonitoring</td>
+              <td>Satellite precision farming</td>
+              <td>Needs internet & scale</td>
+              <td class="compare-win">Built for smallholders</td>
+            </tr>
+            <tr>
+              <td>Extension visits</td>
+              <td>Trusted human advice</td>
+              <td>Slow, limited reach</td>
+              <td class="compare-win">Instant first-line diagnosis</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="highlight-box">
+          <strong>Unique value:</strong> One app — scan leaf → diagnosis → treatment → farm GPS → weather → regional advisories → offline cache.
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 5: My Contribution -->
+    <section class="slide content-slide" data-slide="5">
+      <div class="slide-header">
+        <div class="slide-num">Slide 5 — My original contribution</div>
+        <h2>Location-Invariant Disease Detection</h2>
+      </div>
+      <div class="slide-body">
+        <div class="highlight-box">
+          <strong>The novel piece no crop-scanner does:</strong> a model trained to stay accurate in <em>any</em> agro-ecological location — with <strong>no GPS, no zone, no location input</strong>. The farmer just takes a photo.
+        </div>
+        <p>The same disease on the same crop <em>looks different</em> across East Africa's zones — and a model that memorises one location's look silently fails elsewhere:</p>
+        <ul>
+          <li><strong>Highland</strong> → cool, bright light; higher contrast &amp; saturation</li>
+          <li><strong>Lowland</strong> → warm light, hazy air, lower contrast</li>
+          <li><strong>Humid zones</strong> → soft haze, dew glare, washed-out colour</li>
+          <li><strong>Dry / dusty zones</strong> → warm cast, camera noise, desaturation</li>
+        </ul>
+        <p>This is a <strong>domain-shift</strong> problem. I strengthen the vision model so it recognises the <strong>disease</strong>, not the <strong>location's appearance</strong> — no external data needed at scan time.</p>
+      </div>
+    </section>
+
+    <!-- Slide 6: How it works -->
+    <section class="slide content-slide" data-slide="6">
+      <div class="slide-header">
+        <div class="slide-num">Slide 6 — How it works</div>
+        <h2>Trained to See Through Location</h2>
+      </div>
+      <div class="slide-body">
+        <div class="architecture">  1) AGRO-ECOLOGICAL STYLE AUGMENTATION
+     each leaf re-rendered as many "locations"
+     (white balance, contrast, saturation, haze, noise)
+
+  2) MIXSTYLE  (Zhou et al., ICLR 2021)  — inside MobileNetV2
+     mixes feature statistics across the batch
+     -> synthesises UNSEEN locations, 0 extra parameters
+     -> disabled at inference: deployed model = plain MobileNetV2
+
+  Model selection = balance(clean accuracy, WORST-location accuracy)</div>
+        <p><strong>Held-out location-shift benchmark — baseline vs. strengthened (mine):</strong></p>
+        <table>
+          <thead><tr><th>Location domain</th><th>Baseline CNN</th><th>Strengthened (mine)</th></tr></thead>
+          <tbody>
+            <tr><td>Clean / familiar</td><td>99.7%</td><td class="compare-win">100.0%</td></tr>
+            <tr><td>Highland — cool, bright</td><td>58.1%</td><td class="compare-win">84.4%</td></tr>
+            <tr><td>Lowland — warm, hazy</td><td>16.6%</td><td class="compare-win">86.9%</td></tr>
+            <tr><td>Humid — low contrast</td><td>43.8%</td><td class="compare-win">88.8%</td></tr>
+            <tr><td>Dry / dusty — warm</td><td>69.1%</td><td class="compare-win">96.6%</td></tr>
+          </tbody>
+        </table>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="value">16.6% → 84.4%</div><div class="label">Worst-location accuracy (+67.8 pts)</div></div>
+          <div class="stat-card"><div class="value">46.9% → 89.1%</div><div class="label">Average across locations</div></div>
+          <div class="stat-card"><div class="value">0</div><div class="label">Location inputs needed at scan</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 7: Architecture -->
+    <section class="slide content-slide" data-slide="7">
+      <div class="slide-header">
+        <div class="slide-num">Slide 7</div>
+        <h2>System Architecture</h2>
+      </div>
+      <div class="slide-body">
+        <div class="architecture">  Flutter Mobile App  (Scan / Farms / Weather / Profile)
+  SQLite offline cache · English + Kinyarwanda
+             |  REST API (JWT)
+             v
+  FastAPI Backend :8001   POST /analyze/image  (photo + crop only)
+             |
+    +--------+--------+----------------+
+    v        v        v                v
+ MongoDB  Vision CNN (MobileNetV2)  Open-Meteo
+ users    location-invariant        weather +
+ farms    20 classes                elevation
+ diagnoses  (MixStyle + agro aug)   (farm advisories only)</div>
+        <p><strong>Diagnosis needs no location</strong> — the model is location-invariant. Farm GPS drives only weather &amp; advisories.</p>
+        <p><strong>Crop-aware inference:</strong> probabilities filtered by selected crop — a cassava scan cannot return a tomato disease.</p>
+      </div>
+    </section>
+
+    <!-- Slide 8: Tech Stack -->
+    <section class="slide content-slide" data-slide="8">
+      <div class="slide-header">
+        <div class="slide-num">Slide 8</div>
+        <h2>Technology Stack</h2>
+      </div>
+      <div class="slide-body">
+        <table>
+          <thead><tr><th>Layer</th><th>Technology</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td>Mobile</td><td>Flutter 3, Provider</td><td>Cross-platform UI (iOS + Android)</td></tr>
+            <tr><td>Local</td><td>SQLite, SharedPreferences</td><td>Offline cache & settings</td></tr>
+            <tr><td>Maps</td><td>flutter_map, OpenStreetMap</td><td>Farm GPS picker</td></tr>
+            <tr><td>Backend</td><td>FastAPI, Uvicorn</td><td>REST API, JWT auth</td></tr>
+            <tr><td>Database</td><td>MongoDB</td><td>Users, farms, diagnoses</td></tr>
+            <tr><td>ML</td><td>PyTorch, MobileNetV2</td><td>CNN training & inference</td></tr>
+            <tr><td>Weather</td><td>Open-Meteo</td><td>Forecast per farm location</td></tr>
+            <tr><td>DevOps</td><td>Docker, Jupyter</td><td>Containers, model notebook</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Slide 9: ML Model -->
+    <section class="slide content-slide" data-slide="9">
+      <div class="slide-header">
+        <div class="slide-num">Slide 9</div>
+        <h2>Machine Learning Model</h2>
+      </div>
+      <div class="slide-body">
+        <div class="two-col">
+          <div>
+            <p><strong>Architecture</strong></p>
+            <ul>
+              <li>MobileNetV2 (ImageNet transfer learning)</li>
+              <li>Custom classifier head → 20 classes</li>
+              <li>Input: 224×224 RGB leaf images</li>
+              <li>Augmentation: crop, flip, rotation, color jitter</li>
+            </ul>
+            <p><strong>Training:</strong> 80/20 split, class-weighted loss, checkpoint saved to <code>kulimaiq_mobilenet.pth</code></p>
+          </div>
+          <div>
+            <div class="stat-grid">
+              <div class="stat-card"><div class="value">99.7%</div><div class="label">Accuracy</div></div>
+              <div class="stat-card"><div class="value">20</div><div class="label">Disease classes</div></div>
+              <div class="stat-card"><div class="value">8</div><div class="label">Crop types</div></div>
+              <div class="stat-card"><div class="value">320</div><div class="label">Val images</div></div>
+            </div>
+          </div>
+        </div>
+        <p><strong>Classes:</strong> Banana, Bean, Cassava, Coffee, Maize, Potato, Rice, Tomato + Healthy</p>
+      </div>
+    </section>
+
+    <!-- Slide 10: Datasets -->
+    <section class="slide content-slide" data-slide="10">
+      <div class="slide-header">
+        <div class="slide-num">Slide 10</div>
+        <h2>Datasets Used</h2>
+      </div>
+      <div class="slide-body">
+        <table>
+          <thead><tr><th>Source</th><th>Dataset</th><th>Crops / diseases</th></tr></thead>
+          <tbody>
+            <tr><td>HuggingFace</td><td>PlantVillage</td><td>Tomato, potato, maize, healthy, many classes</td></tr>
+            <tr><td>Kaggle</td><td>Cassava Leaf Disease (iCassava)</td><td>CMD, cassava diseases</td></tr>
+            <tr><td>Kaggle</td><td>Bean Leaf Lesions (iBean)</td><td>Angular spot, rust</td></tr>
+            <tr><td>Kaggle</td><td>Rice Leafs</td><td>Blast, brown spot</td></tr>
+            <tr><td>Kaggle</td><td>Banana Disease Recognition</td><td>Sigatoka, wilt</td></tr>
+            <tr><td>Kaggle</td><td>Coffee Leaf Diseases</td><td>Rust, berry disease</td></tr>
+            <tr><td>Mendeley</td><td>Tanzania Maize Imagery</td><td>MLN (maize necrosis)</td></tr>
+            <tr><td>Mendeley</td><td>Ethiopia Banana Dataset</td><td>BXW (banana wilt)</td></tr>
+          </tbody>
+        </table>
+        <p>Prepared via <code>python scripts/prepare_data.py</code> → folder layout <code>{crop}_{disease}/</code></p>
+        <div class="highlight-box">
+          <strong>Location-shift domains:</strong> for the robustness benchmark, the validation set is re-rendered into simulated agro-ecological "location looks" (highland / lowland / humid / dry). These are designed to be replaced by <strong>real geo-tagged field images</strong> from the Byumba pilot to push cross-location robustness further.
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 11: Features -->
+    <section class="slide content-slide" data-slide="11">
+      <div class="slide-header">
+        <div class="slide-num">Slide 11</div>
+        <h2>App Features & Demo Flow</h2>
+      </div>
+      <div class="slide-body">
+        <ol>
+          <li><strong>Scan</strong> — Choose crop → take photo → instant diagnosis + treatment steps</li>
+          <li><strong>Farms</strong> — Map picker, GPS, crops grown, health score</li>
+          <li><strong>Farm detail</strong> — What to do now, 10-day weather, scan history</li>
+          <li><strong>Climate</strong> — Weather alerts per farm location</li>
+          <li><strong>Profile</strong> — Farmer info, language (EN / Kinyarwanda)</li>
+        </ol>
+        <div class="highlight-box">
+          <strong>Live demo:</strong> Login → Scan leaf (photo + crop, no location) → View diagnosis + treatment steps → Add farm (with GPS) → Check weather advisory
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 12: SDG & Impact -->
+    <section class="slide content-slide" data-slide="12">
+      <div class="slide-header">
+        <div class="slide-num">Slide 12</div>
+        <h2>Significance & SDG Alignment</h2>
+      </div>
+      <div class="slide-body">
+        <table>
+          <thead><tr><th>SDG</th><th>Contribution</th></tr></thead>
+          <tbody>
+            <tr><td>SDG 2 — Zero Hunger</td><td>Earlier disease response → less crop loss → more food security</td></tr>
+            <tr><td>SDG 13 — Climate Action</td><td>Weather-aware advisories for climate-smart farming</td></tr>
+            <tr><td>SDG 8 — Decent Work</td><td>Protects rural household income from preventable losses</td></tr>
+          </tbody>
+        </table>
+        <p><strong>Stakeholders:</strong> Farmers, cooperatives, Twigire Muhinzi promoters, RAWARD, AgriTech ecosystem.</p>
+        <p><strong>Methodology:</strong> Mixed-methods — model metrics + surveys + interviews + field observation in Byumba (12-week timeline).</p>
+      </div>
+    </section>
+
+    <!-- Slide 13: Limitations -->
+    <section class="slide content-slide" data-slide="13">
+      <div class="slide-header">
+        <div class="slide-num">Slide 13</div>
+        <h2>Limitations & Future Work</h2>
+      </div>
+      <div class="slide-body">
+        <table>
+          <thead><tr><th>Limitation</th><th>Future direction</th></tr></thead>
+          <tbody>
+            <tr><td>Lab vs field accuracy gap</td><td>Collect Byumba field images; retrain</td></tr>
+            <tr><td>Server-side ML (needs connectivity)</td><td>On-device TFLite model</td></tr>
+            <tr><td>20 classes only</td><td>Expand to avocado, mango, sorghum…</td></tr>
+            <tr><td>Pilot: Byumba only</td><td>Scale after validation</td></tr>
+            <tr><td>Geo model trained on agronomic priors</td><td>Re-fit on geo-tagged field labels from the pilot</td></tr>
+          </tbody>
+        </table>
+        <p><strong>Honest note:</strong> Vision metrics (99.7%) are on a curated validation set and the geo prior is simulation-grounded — both should be validated with real Byumba field data (Mwebaze & Biehl, 2019).</p>
+      </div>
+    </section>
+
+    <!-- Slide 14: Closing -->
+    <section class="slide closing-slide" data-slide="14">
+      <h2>Thank You</h2>
+      <p>KulimaIQ bridges AI research and smallholder reality — integrated disease detection, farm-aware advisories, and offline resilience for Eastern Africa.</p>
+      <p style="margin-top: 2rem; font-size: 1.5rem;"><strong>Questions?</strong></p>
+      <p style="margin-top: 1rem; opacity: 0.85;">Sage Muhodari · African Leadership University</p>
+    </section>
+
+  </div>
+
+  <nav class="nav">
+    <button id="prev" disabled>← Previous</button>
+    <span class="progress"><span id="current">1</span> / <span id="total">12</span> &nbsp;·&nbsp; <span class="kbd">←</span> <span class="kbd">→</span> navigate</span>
+    <button id="next">Next →</button>
+  </nav>
+
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let current = 0;
+
+    document.getElementById('total').textContent = total;
+
+    function showSlide(n) {
+      current = Math.max(0, Math.min(n, total - 1));
+      slides.forEach((s, i) => s.classList.toggle('active', i === current));
+      document.getElementById('current').textContent = current + 1;
+      document.getElementById('prev').disabled = current === 0;
+      document.getElementById('next').disabled = current === total - 1;
+      history.replaceState(null, '', `#slide-${current + 1}`);
+    }
+
+    document.getElementById('prev').onclick = () => showSlide(current - 1);
+    document.getElementById('next').onclick = () => showSlide(current + 1);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); showSlide(current + 1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); showSlide(current - 1); }
+      if (e.key === 'Home') showSlide(0);
+      if (e.key === 'End') showSlide(total - 1);
+    });
+
+    // Touch swipe
+    let touchStartX = 0;
+    document.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; });
+    document.addEventListener('touchend', e => {
+      const diff = touchStartX - e.changedTouches[0].screenX;
+      if (Math.abs(diff) > 50) showSlide(diff > 0 ? current + 1 : current - 1);
+    });
+
+    // Hash on load
+    const hash = location.hash.match(/slide-(\d+)/);
+    if (hash) showSlide(parseInt(hash[1], 10) - 1);
+  </script>
+</body>
+</html>

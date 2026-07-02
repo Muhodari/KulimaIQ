@@ -28,8 +28,11 @@ Naming convention for class folders
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from torchvision import models
 from torchvision.models import MobileNet_V2_Weights
+
+from .mixstyle import MixStyle
 
 # Input size expected by MobileNetV2
 INPUT_SIZE = 224
@@ -60,6 +63,39 @@ def build_model(num_classes: int, pretrained: bool = True,
         nn.Linear(512, num_classes),
     )
     return model
+
+
+class MixStyleMobileNet(nn.Module):
+    """MobileNetV2 with MixStyle inserted after early feature blocks.
+
+    Used only for *training* the location-invariant model. Its parameters and
+    module names (``features.*`` / ``classifier.*``) are identical to
+    ``build_model`` output, so the checkpoint loads back into the plain model
+    for inference — where MixStyle does not exist and therefore never fires.
+
+    MixStyle is applied after early blocks (where feature statistics still
+    encode low-level "style" such as colour/lighting/contrast) to simulate
+    unseen agro-ecological location appearances during training.
+    """
+
+    def __init__(self, num_classes: int, pretrained: bool = True,
+                 mixstyle_layers: tuple[int, ...] = (3, 6),
+                 p: float = 0.5, alpha: float = 0.1) -> None:
+        super().__init__()
+        base = build_model(num_classes, pretrained=pretrained)
+        self.features = base.features
+        self.classifier = base.classifier
+        self._mixstyle_layers = set(mixstyle_layers)
+        self.mixstyle = MixStyle(p=p, alpha=alpha)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        for idx, block in enumerate(self.features):
+            x = block(x)
+            if idx in self._mixstyle_layers:
+                x = self.mixstyle(x)
+        x = F.adaptive_avg_pool2d(x, 1)
+        x = torch.flatten(x, 1)
+        return self.classifier(x)
 
 
 def load_model(weights_path: str, device: str = "cpu"):

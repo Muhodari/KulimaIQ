@@ -2,23 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../data/repositories/auth_repository.dart';
-import '../data/repositories/climate_repository.dart';
 import '../data/repositories/diagnosis_repository.dart';
 import '../data/repositories/farm_repository.dart';
 import '../data/repositories/profile_repository.dart';
 import '../data/services/auth_service.dart';
-import '../data/services/climate_api_service.dart';
 import '../data/services/connectivity_service.dart';
 import '../data/services/database_service.dart';
 import '../data/services/disease_inference_service.dart';
 import '../data/services/backend_api_service.dart';
+import '../data/services/farm_advisory_service.dart';
 import '../data/services/farm_service.dart';
-import '../data/services/farm_weather_service.dart';
 import '../data/services/image_capture_service.dart';
 import '../data/services/preferences_service.dart';
 import '../l10n/app_strings.dart';
 import '../ui/features/auth/view_models/auth_view_model.dart';
-import '../ui/features/climate/view_models/climate_view_model.dart';
 import '../ui/features/farms/view_models/farm_view_model.dart';
 import '../ui/features/home/view_models/home_view_model.dart';
 import '../ui/features/profile/view_models/profile_view_model.dart';
@@ -41,7 +38,6 @@ class AppProviders extends StatelessWidget {
           update: (_, backend, __) =>
               DiseaseInferenceService(backendApiService: backend),
         ),
-        Provider(create: (_) => ClimateApiService()),
         Provider(create: (_) => ConnectivityService()),
         Provider(create: (_) => PreferencesService()),
         Provider(create: (_) => ImageCaptureService()),
@@ -66,17 +62,10 @@ class AppProviders extends StatelessWidget {
             backendApiService: backend,
           ),
         ),
-        ProxyProvider2<ClimateApiService, ConnectivityService,
-            ClimateRepository>(
-          update: (_, api, connectivity, __) => ClimateRepository(
-            climateApiService: api,
-            connectivityService: connectivity,
-          ),
-        ),
         ProxyProvider<DatabaseService, ProfileRepository>(
           update: (_, db, __) => ProfileRepository(databaseService: db),
         ),
-        Provider(create: (_) => FarmWeatherService()),
+        Provider(create: (_) => FarmAdvisoryService()),
         ProxyProvider2<DatabaseService, BackendApiService, FarmService>(
           update: (_, db, backend, __) => FarmService(
             databaseService: db,
@@ -124,24 +113,13 @@ class AppProviders extends StatelessWidget {
           update: (_, repo, capture, locale, vm) =>
               vm!..refreshStrings(AppStrings(locale.locale)),
         ),
-        ChangeNotifierProxyProvider3<ClimateRepository, FarmRepository,
-            LocaleViewModel, ClimateViewModel>(
-          create: (ctx) => ClimateViewModel(
-            climateRepository: ctx.read<ClimateRepository>(),
-            farmRepository: ctx.read<FarmRepository>(),
-            strings: AppStrings(ctx.read<LocaleViewModel>().locale),
-          ),
-          update: (_, climateRepo, farmRepo, locale, vm) =>
-              vm!..refreshStrings(AppStrings(locale.locale)),
-        ),
-        ChangeNotifierProxyProvider3<FarmRepository, FarmWeatherService,
-            LocaleViewModel, FarmViewModel>(
+        ChangeNotifierProxyProvider2<FarmRepository, LocaleViewModel,
+            FarmViewModel>(
           create: (ctx) => FarmViewModel(
             farmRepository: ctx.read<FarmRepository>(),
-            farmWeatherService: ctx.read<FarmWeatherService>(),
             strings: AppStrings(ctx.read<LocaleViewModel>().locale),
           ),
-          update: (_, repo, weather, locale, vm) =>
+          update: (_, repo, locale, vm) =>
               vm!..refreshStrings(AppStrings(locale.locale)),
         ),
         ChangeNotifierProxyProvider3<ProfileRepository, LocaleViewModel,

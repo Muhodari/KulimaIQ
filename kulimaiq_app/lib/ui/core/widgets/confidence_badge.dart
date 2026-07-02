@@ -15,7 +15,7 @@ class ConfidenceBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isHealthy ? AppTheme.success : AppTheme.warning;
+    final color = AppTheme.semanticPositive(healthy: isHealthy);
     final percent = (confidence * 100).round();
 
     return Container(

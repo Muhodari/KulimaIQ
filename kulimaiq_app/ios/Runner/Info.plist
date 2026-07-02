@@ -6,8 +6,6 @@
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
 	<string>KulimaIQ</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>KulimaIQ uses your location to automatically set GPS coordinates for each farm so you can see real-time weather at that spot.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>KulimaIQ needs camera access to photograph crop leaves for disease detection.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -53,5 +51,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

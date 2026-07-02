@@ -17,8 +17,8 @@ class Farm {
   const Farm({
     required this.id,
     required this.name,
-    required this.country,
-    required this.region,
+    this.country = '',
+    this.region = '',
     this.latitude,
     this.longitude,
     required this.sizeHa,
@@ -33,16 +33,11 @@ class Farm {
   final String id;
   final String name;
 
-  /// Country where the farm is located (free text, e.g. "Rwanda", "Uganda").
+  /// Retained for storage/backend compatibility only — not collected or shown
+  /// in the app (KulimaIQ needs no location for disease detection).
   final String country;
-
-  /// Sub-region / sector / district within the country.
   final String region;
-
-  /// GPS latitude — used to fetch live weather for this farm.
   final double? latitude;
-
-  /// GPS longitude — used to fetch live weather for this farm.
   final double? longitude;
 
   final double sizeHa;
@@ -55,23 +50,8 @@ class Farm {
   /// 0–100 computed from diagnosis history (null = no scans yet).
   final double? healthScore;
 
-  bool get hasCoordinates => latitude != null && longitude != null;
-
-  /// Short human-readable location, e.g. "Musanze, Rwanda".
-  String get locationDisplay {
-    if (region.isNotEmpty && country.isNotEmpty) return '$region, $country';
-    if (region.isNotEmpty) return region;
-    if (country.isNotEmpty) return country;
-    return '';
-  }
-
   Farm copyWith({
     String? name,
-    String? country,
-    String? region,
-    double? latitude,
-    double? longitude,
-    bool clearCoordinates = false,
     double? sizeHa,
     List<CropType>? crops,
     FarmHealthStatus? healthStatus,
@@ -82,10 +62,10 @@ class Farm {
     return Farm(
       id: id,
       name: name ?? this.name,
-      country: country ?? this.country,
-      region: region ?? this.region,
-      latitude: clearCoordinates ? null : (latitude ?? this.latitude),
-      longitude: clearCoordinates ? null : (longitude ?? this.longitude),
+      country: country,
+      region: region,
+      latitude: latitude,
+      longitude: longitude,
       sizeHa: sizeHa ?? this.sizeHa,
       crops: crops ?? this.crops,
       healthStatus: healthStatus ?? this.healthStatus,

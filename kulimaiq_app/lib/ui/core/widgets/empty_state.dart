@@ -36,7 +36,8 @@ class EmptyState extends StatelessWidget {
             message,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppTheme.textSecondary,
+                  color: AppTheme.textPrimary,
+                  fontWeight: FontWeight.w500,
                 ),
           ),
           if (actionLabel != null && onAction != null) ...[

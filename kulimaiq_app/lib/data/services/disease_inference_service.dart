@@ -32,6 +32,12 @@ class DiseaseInferenceService {
     );
 
     if (backendResult != null) {
+      final cropFiltered = _filterProbabilitiesByCrop(
+        backendResult.allProbabilities,
+        crop.id,
+      );
+      final likelyDiseases = cropFiltered.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
       // The backend returns the exact class label (e.g. "tomato_late_blight").
       // DiseaseType.fromId returns null for labels not yet in the enum —
       // that is fine, we pass null and the UI shows the raw label gracefully.
@@ -41,6 +47,12 @@ class DiseaseInferenceService {
         rawDiseaseLabel: backendResult.disease,
         recommendation: backendResult.recommendation,
         confidence: backendResult.confidence,
+        severity: backendResult.severity,
+        actions: backendResult.actions,
+        likelyDiseases: likelyDiseases
+            .take(3)
+            .map((e) => LikelyDisease(label: e.key, confidence: e.value))
+            .toList(),
         source: InferenceSource.backend,
         backendDiagnosisId: backendResult.diagnosisId,
       );
@@ -65,6 +77,14 @@ class DiseaseInferenceService {
       rawDiseaseLabel: disease?.id ?? 'healthy',
       recommendation: null,   // offline — UI falls back to local strings
       confidence: confidence.clamp(0.0, 0.99),
+      severity: null,
+      actions: const [],
+      likelyDiseases: [
+        LikelyDisease(
+          label: disease?.id ?? 'healthy',
+          confidence: confidence.clamp(0.0, 0.99),
+        ),
+      ],
       source: InferenceSource.offline,
     );
   }
@@ -116,6 +136,28 @@ class DiseaseInferenceService {
         return [DiseaseType.healthy];
     }
   }
+
+  Map<String, double> _filterProbabilitiesByCrop(
+    Map<String, double> allProbabilities,
+    String cropId,
+  ) {
+    final filtered = <String, double>{};
+    for (final entry in allProbabilities.entries) {
+      if (entry.key == 'healthy' || entry.key.startsWith('${cropId}_')) {
+        filtered[entry.key] = entry.value;
+      }
+    }
+    if (filtered.isEmpty) {
+      return allProbabilities;
+    }
+    final total = filtered.values.fold<double>(0, (sum, value) => sum + value);
+    if (total <= 0) {
+      return filtered;
+    }
+    return {
+      for (final entry in filtered.entries) entry.key: entry.value / total,
+    };
+  }
 }
 
 enum InferenceSource { backend, offline }
@@ -127,6 +169,9 @@ class InferenceOutput {
     required this.confidence,
     required this.source,
     this.recommendation,
+    this.severity,
+    this.actions = const [],
+    this.likelyDiseases = const [],
     this.backendDiagnosisId,
   });
 
@@ -140,6 +185,9 @@ class InferenceOutput {
 
   /// Full recommendation text from the backend, or null when offline.
   final String? recommendation;
+  final String? severity;
+  final List<String> actions;
+  final List<LikelyDisease> likelyDiseases;
 
   /// MongoDB-assigned ID from the backend. When set, the local record should
   /// reuse this ID so remote and local records stay in sync (no duplicates).
@@ -149,4 +197,14 @@ class InferenceOutput {
 
   bool get isHealthy =>
       disease == DiseaseType.healthy || rawDiseaseLabel == 'healthy';
+}
+
+class LikelyDisease {
+  const LikelyDisease({
+    required this.label,
+    required this.confidence,
+  });
+
+  final String label;
+  final double confidence;
 }

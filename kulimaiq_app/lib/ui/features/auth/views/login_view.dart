@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../data/services/auth_service.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widgets/brand_logo.dart';
@@ -80,7 +79,6 @@ class _LoginViewState extends State<LoginView> {
                     const BrandLogo(size: 48, light: true),
                     const LanguageSelector(
                       compact: true,
-                      showHint: true,
                       onDark: true,
                     ),
                   ],
@@ -118,8 +116,8 @@ class _LoginViewState extends State<LoginView> {
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           vm.isRegisterMode
-                              ? 'Join farmers using KulimaIQ in Byumba Sector.'
-                              : 'Sign in to detect crop diseases and get local advisories.',
+                              ? s.t('register_subtitle')
+                              : s.t('login_subtitle'),
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                         const SizedBox(height: AppSpacing.xxl),
@@ -139,7 +137,6 @@ class _LoginViewState extends State<LoginView> {
                           keyboardType: TextInputType.phone,
                           decoration: InputDecoration(
                             labelText: s.t('login_phone'),
-                            hintText: s.t('login_phone_hint'),
                             prefixIcon: const Icon(Icons.phone_outlined),
                           ),
                         ),
@@ -190,39 +187,6 @@ class _LoginViewState extends State<LoginView> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
-                  KulimaCard(
-                    accentColor: AppTheme.primary,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.info_outline_rounded,
-                                color: AppTheme.primary, size: 20),
-                            const SizedBox(width: AppSpacing.sm),
-                            Text(
-                              s.t('login_demo_title'),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                                color: AppTheme.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        _DemoRow(
-                          label: s.t('login_phone'),
-                          value: AuthService.demoPhone,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        _DemoRow(
-                          label: s.t('login_password'),
-                          value: AuthService.demoPassword,
-                        ),
-                      ],
-                    ),
-                  ),
                   const SizedBox(height: AppSpacing.xxl),
                 ],
               ),
@@ -230,34 +194,6 @@ class _LoginViewState extends State<LoginView> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _DemoRow extends StatelessWidget {
-  const _DemoRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 100,
-          child: Text(label, style: Theme.of(context).textTheme.bodySmall),
-        ),
-        Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              color: AppTheme.textPrimary,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -96,6 +96,13 @@ class ProfileViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setCrops(Set<String> cropIds) {
+    _selectedCrops
+      ..clear()
+      ..addAll(cropIds);
+    notifyListeners();
+  }
+
   Future<void> save() async {
     _saving = true;
     notifyListeners();

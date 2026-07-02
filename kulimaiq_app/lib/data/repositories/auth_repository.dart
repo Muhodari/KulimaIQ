@@ -27,5 +27,9 @@ class AuthRepository {
 
   Future<AuthUser?> getCurrentUser() => _authService.getCurrentUser();
 
+  /// Re-obtain a JWT when the user is already signed in but the token expired.
+  Future<void> refreshBackendSession() =>
+      _authService.refreshBackendSession();
+
   Future<void> logout() => _authService.logout();
 }

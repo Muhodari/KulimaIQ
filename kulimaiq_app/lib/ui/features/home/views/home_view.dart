@@ -54,11 +54,14 @@ class _HomeViewState extends State<HomeView> {
                 onScan: widget.onScanTap,
               ),
               const SizedBox(height: AppSpacing.xxl),
+              SectionHeader(
+                title: s.t('home_shortcuts'),
+                subtitle: s.t('home_shortcuts_sub'),
+              ),
               _QuickActions(
-                onScan: widget.onScanTap,
                 strings: s,
-                onClimate: () => context.read<AppShellViewModel>().setTab(2),
-                onFarms: () => context.read<AppShellViewModel>().setTab(3),
+                onScan: widget.onScanTap,
+                onFarms: () => context.read<AppShellViewModel>().setTab(2),
               ),
               const SizedBox(height: AppSpacing.xxl),
               SectionHeader(title: s.t('home_recent')),
@@ -142,8 +145,8 @@ class _HeroBanner extends StatelessWidget {
           FilledButton.icon(
             onPressed: onScan,
             style: FilledButton.styleFrom(
-              backgroundColor: AppTheme.accent,
-              foregroundColor: AppTheme.textPrimary,
+              backgroundColor: Colors.white,
+              foregroundColor: AppTheme.primary,
               elevation: 0,
             ),
             icon: const Icon(Icons.camera_alt_rounded),
@@ -157,14 +160,12 @@ class _HeroBanner extends StatelessWidget {
 
 class _QuickActions extends StatelessWidget {
   const _QuickActions({
-    required this.onScan,
     required this.strings,
-    required this.onClimate,
+    required this.onScan,
     required this.onFarms,
   });
 
   final VoidCallback onScan;
-  final VoidCallback onClimate;
   final VoidCallback onFarms;
   final AppStrings strings;
 
@@ -176,17 +177,7 @@ class _QuickActions extends StatelessWidget {
           child: _ActionChip(
             icon: Icons.camera_alt_rounded,
             label: strings.t('nav_scan'),
-            color: AppTheme.primary,
             onTap: onScan,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: _ActionChip(
-            icon: Icons.cloud_rounded,
-            label: strings.t('nav_climate'),
-            color: const Color(0xFF0277BD),
-            onTap: onClimate,
           ),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -194,7 +185,6 @@ class _QuickActions extends StatelessWidget {
           child: _ActionChip(
             icon: Icons.landscape_rounded,
             label: strings.t('nav_farms'),
-            color: AppTheme.accent,
             onTap: onFarms,
           ),
         ),
@@ -207,41 +197,48 @@ class _ActionChip extends StatelessWidget {
   const _ActionChip({
     required this.icon,
     required this.label,
-    required this.color,
     required this.onTap,
   });
 
   final IconData icon;
   final String label;
-  final Color color;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppTheme.surfaceCard,
+      color: AppTheme.primarySoft,
       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
+          padding: const EdgeInsets.symmetric(
+            vertical: AppSpacing.lg,
+            horizontal: AppSpacing.sm,
+          ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-            border: Border.all(color: AppTheme.border),
-            boxShadow: [AppTheme.cardShadow],
+            border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
           ),
           child: Column(
             children: [
-              Icon(icon, color: color, size: 26),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceCard,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: AppTheme.primary, size: 24),
+              ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 label,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.primary,
                 ),
               ),
             ],
@@ -263,8 +260,7 @@ class _HistoryTile extends StatelessWidget {
     final date = DateFormat.MMMd().add_jm().format(result.createdAt);
     final diseaseLabel = strings.diseaseLabel(result.rawDiseaseLabel);
     final cropLabel = strings.cropLabel(result.crop.id);
-    final accent =
-        result.isHealthy ? AppTheme.success : AppTheme.warning;
+    final accent = AppTheme.semanticPositive(healthy: result.isHealthy);
 
     return KulimaCard(
       accentColor: accent,

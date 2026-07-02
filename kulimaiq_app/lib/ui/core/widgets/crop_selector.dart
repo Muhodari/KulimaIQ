@@ -4,277 +4,110 @@ import '../../../domain/models/crop_type.dart';
 import '../../../l10n/app_strings.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_theme.dart';
+import 'crop_picker_sheet.dart';
 
-/// Searchable, scrollable grid for selecting a crop type.
-///
-/// With 26+ crops a simple horizontal row no longer works.
-/// This widget shows a search field and a 3-column grid.
-class CropSelector extends StatefulWidget {
+/// Compact single-select crop field — opens a searchable picker sheet.
+class CropSelector extends StatelessWidget {
   const CropSelector({
     super.key,
     required this.selected,
     required this.onSelected,
     required this.strings,
+    this.allowedCrops,
+    this.hint,
   });
 
   final CropType selected;
   final ValueChanged<CropType> onSelected;
   final AppStrings strings;
+  final List<CropType>? allowedCrops;
+  final String? hint;
 
-  @override
-  State<CropSelector> createState() => _CropSelectorState();
-}
+  List<CropType> get _crops =>
+      (allowedCrops != null && allowedCrops!.isNotEmpty)
+          ? allowedCrops!
+          : CropType.values;
 
-class _CropSelectorState extends State<CropSelector> {
-  final _searchCtrl = TextEditingController();
-  String _query = '';
-  bool _expanded = false;
+  bool get _farmMode => allowedCrops != null && allowedCrops!.isNotEmpty;
 
-  @override
-  void dispose() {
-    _searchCtrl.dispose();
-    super.dispose();
+  Future<void> _openPicker(BuildContext context) async {
+    final picked = await showCropPickerSheet(
+      context: context,
+      strings: strings,
+      selected: selected,
+      crops: _crops,
+      title: _farmMode
+          ? strings.t('scan_select_farm_crop')
+          : strings.t('crop_picker_single_title'),
+    );
+    if (picked != null) {
+      onSelected(picked);
+    }
   }
 
-  List<CropType> get _filtered {
-    if (_query.isEmpty) return CropType.values;
-    final q = _query.toLowerCase();
-    return CropType.values.where((c) {
-      return c.id.contains(q) ||
-          widget.strings.cropLabel(c.id).toLowerCase().contains(q);
-    }).toList();
-  }
-
-  // Show selected crop as the compact "chip", expand grid on tap.
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // ── Selected crop chip + expand toggle ─────────────────────────────
-        _SelectedCropChip(
-          crop: widget.selected,
-          label: widget.strings.cropLabel(widget.selected.id),
-          expanded: _expanded,
-          onTap: () => setState(() => _expanded = !_expanded),
-        ),
-        // ── Expanded picker ─────────────────────────────────────────────────
-        if (_expanded) ...[
-          const SizedBox(height: AppSpacing.sm),
-          // Search bar
-          TextField(
-            controller: _searchCtrl,
-            autofocus: true,
-            decoration: InputDecoration(
-              hintText: widget.strings.t('scan_search_crop'),
-              prefixIcon: const Icon(Icons.search_rounded, size: 20),
-              suffixIcon: _query.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear_rounded, size: 18),
-                      onPressed: () {
-                        _searchCtrl.clear();
-                        setState(() => _query = '');
-                      },
-                    )
-                  : null,
-              isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+        if (_farmMode) ...[
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
             ),
-            onChanged: (v) => setState(() => _query = v),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          // Grid (constrained height, scrollable)
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxHeight: 280),
-            child: _CropGrid(
-              crops: _filtered,
-              selected: widget.selected,
-              strings: widget.strings,
-              onTap: (crop) {
-                widget.onSelected(crop);
-                setState(() {
-                  _expanded = false;
-                  _query = '';
-                  _searchCtrl.clear();
-                });
-              },
+            decoration: BoxDecoration(
+              color: AppTheme.primarySoft,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+              border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
             ),
-          ),
-        ],
-      ],
-    );
-  }
-}
-
-// ── Sub-widgets ───────────────────────────────────────────────────────────────
-
-class _SelectedCropChip extends StatelessWidget {
-  const _SelectedCropChip({
-    required this.crop,
-    required this.label,
-    required this.expanded,
-    required this.onTap,
-  });
-
-  final CropType crop;
-  final String label;
-  final bool expanded;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-        decoration: BoxDecoration(
-          color: crop.color,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-          border: Border.all(color: AppTheme.primary, width: 2),
-        ),
-        child: Row(
-          children: [
-            Icon(crop.icon, color: AppTheme.primary, size: 24),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.primary,
-                ),
-              ),
-            ),
-            Icon(
-              expanded
-                  ? Icons.keyboard_arrow_up_rounded
-                  : Icons.keyboard_arrow_down_rounded,
-              color: AppTheme.primary,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CropGrid extends StatelessWidget {
-  const _CropGrid({
-    required this.crops,
-    required this.selected,
-    required this.strings,
-    required this.onTap,
-  });
-
-  final List<CropType> crops;
-  final CropType selected;
-  final AppStrings strings;
-  final ValueChanged<CropType> onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    if (crops.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Text(
-            strings.t('scan_no_crop_found'),
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ),
-      );
-    }
-    return GridView.builder(
-      shrinkWrap: true,
-      itemCount: crops.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: AppSpacing.sm,
-        mainAxisSpacing: AppSpacing.sm,
-        childAspectRatio: 1.1,
-      ),
-      itemBuilder: (context, i) {
-        final crop = crops[i];
-        final isSelected = crop == selected;
-        return _CropTile(
-          label: strings.cropLabel(crop.id),
-          icon: crop.icon,
-          bgColor: crop.color,
-          selected: isSelected,
-          onTap: () => onTap(crop),
-        );
-      },
-    );
-  }
-}
-
-class _CropTile extends StatelessWidget {
-  const _CropTile({
-    required this.label,
-    required this.icon,
-    required this.bgColor,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final IconData icon;
-  final Color bgColor;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-          decoration: BoxDecoration(
-            color: selected ? AppTheme.primary.withValues(alpha: 0.12) : bgColor,
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-            border: Border.all(
-              color: selected ? AppTheme.primary : AppTheme.border,
-              width: selected ? 2 : 1,
-            ),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                color: selected ? AppTheme.primary : AppTheme.textSecondary,
-                size: 24,
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight:
-                        selected ? FontWeight.w700 : FontWeight.w500,
-                    color: selected
-                        ? AppTheme.primary
-                        : AppTheme.textSecondary,
+            child: Row(
+              children: [
+                Icon(Icons.landscape_rounded, size: 16, color: AppTheme.primary),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    strings.t('scan_farm_crops_only'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary,
+                    ),
                   ),
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+        ],
+        InkWell(
+          onTap: () => _openPicker(context),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          child: InputDecorator(
+            decoration: InputDecoration(
+              hintText: hint ?? strings.t('crop_select_one'),
+              prefixIcon: Container(
+                margin: const EdgeInsets.all(AppSpacing.sm),
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: selected.color,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(selected.icon, color: AppTheme.primary, size: 20),
               ),
-            ],
+              suffixIcon: const Icon(Icons.expand_more_rounded),
+            ),
+            child: Text(
+              strings.cropLabel(selected.id),
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                color: AppTheme.textPrimary,
+              ),
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

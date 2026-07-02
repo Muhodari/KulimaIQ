@@ -7,12 +7,14 @@ from .config import settings
 from .database import close_db
 from .ml.inference import init_inference_service
 from .routers import analyze, auth, crops, diagnoses, farms
+from .seed import ensure_demo_user
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # ── Startup ───────────────────────────────────────────────────────────────
     init_inference_service(settings.model_weights_path)
+    await ensure_demo_user()
     yield
     # ── Shutdown ──────────────────────────────────────────────────────────────
     await close_db()

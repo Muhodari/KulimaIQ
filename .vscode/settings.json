@@ -1,0 +1,9 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "jupyter.jupyterServerType": "local",
+  "jupyter.kernels.excludePythonEnvironments": [
+    "${env:HOME}/.venvs/myenv"
+  ],
+  "notebook.defaultFormatter": "ms-python.python"
+}

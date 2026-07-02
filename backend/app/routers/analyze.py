@@ -1,9 +1,13 @@
 """
-Analyze router — fully dynamic class support.
+Analyze router — location-invariant disease detection.
 
-Recommendations are loaded from app/ml/recommendations.json at startup.
-Any class label from the trained model will work; unknown labels get a
-sensible fallback recommendation.
+The deployed vision model is trained to detect disease from the leaf alone,
+robust to agro-ecological location (see app/ml/train_robust.py). No location,
+GPS or zone is required or used at scan time — the request carries only the
+leaf photo and the crop.
+
+Recommendations are loaded from app/ml/recommendations.json at startup. Any
+class label from the trained model works; unknown labels get a fallback.
 """
 
 import base64
@@ -19,7 +23,7 @@ from PIL import Image
 
 from ..auth import get_current_user
 from ..database import diagnoses_col, farms_col
-from ..ml.inference import get_inference_service
+from ..ml.inference import filter_probs_by_crop, get_inference_service
 from ..models.diagnosis import AnalyzeResult
 
 router = APIRouter(prefix="/analyze", tags=["analyze"])
@@ -39,11 +43,9 @@ _RECOMMENDATIONS: dict[str, dict] = _load_recommendations()
 
 
 def _get_recommendation(label: str) -> str:
-    """Return the summary text for a label, or a sensible fallback."""
     info = _RECOMMENDATIONS.get(label)
     if info:
         return info.get("summary", "")
-    # Fallback: derive human-readable label from folder name convention
     parts = label.replace("_", " ").split()
     if len(parts) >= 2 and parts[-1] == "healthy":
         return f"Your {' '.join(parts[:-1])} plant looks healthy. Continue regular monitoring."
@@ -79,7 +81,7 @@ async def _run_analysis(
             status_code=503,
             detail=(
                 "ML model not loaded. Train the model first "
-                "(python -m app.ml.train) or place pre-trained weights at "
+                "(python -m app.ml.train_robust) or place pre-trained weights at "
                 "model_weights/kulimaiq_mobilenet.pth"
             ),
         )
@@ -89,7 +91,24 @@ async def _run_analysis(
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid image file")
 
-    probabilities = svc.predict(image)          # {label: probability}
+    raw_probabilities = svc.predict(image)
+    probabilities = filter_probs_by_crop(raw_probabilities, crop)
+    if not probabilities:
+        supported = sorted(
+            {
+                label.split("_", 1)[0]
+                for label in raw_probabilities
+                if label != "healthy" and "_" in label
+            }
+        )
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Crop '{crop}' is not supported by the deployed model. "
+                f"Supported crops: {', '.join(supported)}"
+            ),
+        )
+
     top_label = max(probabilities, key=lambda k: probabilities[k])
     confidence = probabilities[top_label]
 

@@ -13,6 +13,9 @@ class DiagnosisResult {
     required this.isOffline,
     this.recommendation,
     this.recommendationKey,
+    this.severity,
+    this.actions = const [],
+    this.likelyDiseases = const [],
   });
 
   final String id;
@@ -33,7 +36,20 @@ class DiagnosisResult {
 
   /// Legacy key for local string lookup (used offline).
   final String? recommendationKey;
+  final String? severity;
+  final List<String> actions;
+  final List<LikelyDiagnosis> likelyDiseases;
 
   bool get isHealthy =>
       disease == DiseaseType.healthy || rawDiseaseLabel == 'healthy';
+}
+
+class LikelyDiagnosis {
+  const LikelyDiagnosis({
+    required this.label,
+    required this.confidence,
+  });
+
+  final String label;
+  final double confidence;
 }

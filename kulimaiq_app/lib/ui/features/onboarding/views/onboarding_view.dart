@@ -60,9 +60,9 @@ class OnboardingView extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.xxl),
               ...[
-                (Icons.camera_alt_rounded, 'CMD · MLN · BXW detection'),
-                (Icons.cloud_rounded, 'Local weather advisories'),
-                (Icons.landscape_rounded, 'Track all your farms and health'),
+                (Icons.camera_alt_rounded, s.t('onboarding_feature_scan')),
+                (Icons.cloud_rounded, s.t('onboarding_feature_weather')),
+                (Icons.landscape_rounded, s.t('onboarding_feature_farms')),
               ].map(
                 (item) => Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.md),

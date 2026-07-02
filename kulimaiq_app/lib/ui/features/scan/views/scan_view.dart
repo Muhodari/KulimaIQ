@@ -11,7 +11,7 @@ import '../../../core/widgets/confidence_badge.dart';
 import '../../../core/widgets/crop_selector.dart';
 import '../../../core/widgets/error_banner.dart';
 import '../../../core/widgets/kulima_card.dart';
-import '../../../core/widgets/section_header.dart';
+import '../../../core/widgets/step_section.dart';
 import '../view_models/scan_view_model.dart';
 
 class ScanView extends StatefulWidget {
@@ -33,234 +33,476 @@ class _ScanViewState extends State<ScanView> {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<ScanViewModel>();
-    final s = vm.strings;
 
     return ListenableBuilder(
       listenable: vm,
       builder: (context, _) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SectionHeader(
-                title: s.t('scan_title'),
-                subtitle: s.t('scan_subtitle'),
-              ),
-              Text(
-                s.t('scan_select_crop'),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontSize: 14,
-                    ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              CropSelector(
-                selected: vm.selectedCrop,
-                onSelected: vm.selectCrop,
-                strings: s,
-              ),
-              const SizedBox(height: AppSpacing.xxl),
-              _ImagePreview(path: vm.imagePath),
-              const SizedBox(height: AppSpacing.lg),
-              if (!vm.loadingCapabilities && !vm.cameraSupported)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: Container(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: AppTheme.accentSoft,
-                      borderRadius:
-                          BorderRadius.circular(AppSpacing.radiusSm),
-                      border: Border.all(color: AppTheme.border),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.info_outline_rounded,
-                            color: AppTheme.accent, size: 20),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Text(
-                            s.t('scan_camera_unavailable_hint'),
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: vm.analyzing ||
-                              vm.loadingCapabilities ||
-                              !vm.cameraSupported
-                          ? null
-                          : () => vm.pickImage(ImageSource.camera),
-                      icon: const Icon(Icons.camera_alt_rounded),
-                      label: Text(s.t('scan_take_photo')),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: vm.analyzing
-                          ? null
-                          : () => vm.pickImage(ImageSource.gallery),
-                      icon: const Icon(Icons.photo_library_rounded),
-                      label: Text(s.t('scan_gallery')),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              FilledButton(
-                onPressed: vm.analyzing ? null : vm.analyze,
-                child: vm.analyzing
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.md),
-                          Text(s.t('scan_analyzing')),
-                        ],
-                      )
-                    : Text(s.t('scan_analyze')),
-              ),
-              if (vm.error != null && vm.error!.isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.lg),
-                ErrorBanner(message: vm.error!),
-              ],
-              if (vm.result != null) ...[
-                const SizedBox(height: AppSpacing.xxl),
-                _ResultCard(viewModel: vm),
-              ],
-            ],
-          ),
-        );
+        if (vm.result != null && !vm.analyzing) {
+          return _ScanResultView(vm: vm);
+        }
+        return _ScanInputView(vm: vm);
       },
     );
   }
 }
 
-class _ImagePreview extends StatelessWidget {
-  const _ImagePreview({this.path});
+// ── Input flow ────────────────────────────────────────────────────────────────
 
-  final String? path;
+class _ScanInputView extends StatelessWidget {
+  const _ScanInputView({required this.vm});
+  final ScanViewModel vm;
 
   @override
   Widget build(BuildContext context) {
-    final hasImage = path != null;
+    final s = vm.strings;
 
-    return AspectRatio(
-      aspectRatio: 4 / 3,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: AppTheme.surfaceCard,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          border: Border.all(
-            color: hasImage ? AppTheme.primary : AppTheme.border,
-            width: hasImage ? 2 : 1.5,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(AppSpacing.screenPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            s.t('scan_title'),
+            style: Theme.of(context).textTheme.titleLarge,
           ),
-          boxShadow: hasImage ? [AppTheme.cardShadow] : null,
-        ),
-        child: hasImage
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd - 2),
-                child: Image.file(File(path!), fit: BoxFit.cover),
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add_a_photo_rounded,
-                    size: 48,
-                    color: AppTheme.primary.withValues(alpha: 0.5),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'KulimaIQ · AI Scan',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w600,
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            s.t('scan_subtitle'),
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          if (vm.isFarmScan) ...[
+            const SizedBox(height: AppSpacing.lg),
+            _FarmContextBanner(vm: vm, strings: s),
+          ],
+          const SizedBox(height: AppSpacing.lg),
+          KulimaCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                StepSection(
+                  step: 1,
+                  title: vm.isFarmScan
+                      ? s.t('scan_select_farm_crop')
+                      : s.t('scan_step_crop'),
+                  subtitle: s.t('scan_step_crop_sub'),
+                  child: vm.isFarmScan && !vm.hasFarmCrops
+                      ? _NoCropsWarning(strings: s)
+                      : CropSelector(
+                          selected: vm.selectedCrop,
+                          onSelected: vm.selectCrop,
+                          strings: s,
+                          allowedCrops:
+                              vm.hasFarmCrops ? vm.farmCrops : null,
                         ),
+                ),
+                StepSection(
+                  step: 2,
+                  title: s.t('scan_step_photo'),
+                  subtitle: s.t('scan_step_photo_sub'),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _ImagePreview(
+                        path: vm.imagePath,
+                        compact: true,
+                        placeholder: s.t('scan_placeholder'),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+                      if (!vm.loadingCapabilities && !vm.cameraSupported)
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(bottom: AppSpacing.md),
+                          child: _InfoBanner(
+                            message: s.t('scan_camera_unavailable_hint'),
+                          ),
+                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: vm.analyzing ||
+                                      vm.loadingCapabilities ||
+                                      !vm.cameraSupported
+                                  ? null
+                                  : () =>
+                                      vm.pickImage(ImageSource.camera),
+                              icon: const Icon(Icons.camera_alt_rounded),
+                              label: Text(s.t('scan_take_photo')),
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: vm.analyzing
+                                  ? null
+                                  : () =>
+                                      vm.pickImage(ImageSource.gallery),
+                              icon: const Icon(Icons.photo_library_rounded),
+                              label: Text(s.t('scan_gallery')),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                StepSection(
+                  step: 3,
+                  title: s.t('scan_step_analyze'),
+                  isLast: true,
+                  child: FilledButton(
+                    onPressed: (vm.analyzing ||
+                            (vm.isFarmScan && !vm.hasFarmCrops))
+                        ? null
+                        : vm.analyze,
+                    child: vm.analyzing
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.md),
+                              Text(s.t('scan_analyzing')),
+                            ],
+                          )
+                        : Text(s.t('scan_analyze')),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (vm.error != null && vm.error!.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.lg),
+            ErrorBanner(message: vm.error!),
+          ],
+        ],
       ),
     );
   }
 }
 
-class _ResultCard extends StatelessWidget {
-  const _ResultCard({required this.viewModel});
+// ── Result flow (no scroll needed for main finding) ───────────────────────────
 
-  final ScanViewModel viewModel;
+class _ScanResultView extends StatelessWidget {
+  const _ScanResultView({required this.vm});
+  final ScanViewModel vm;
 
   @override
   Widget build(BuildContext context) {
-    final result = viewModel.result!;
-    final s = viewModel.strings;
+    final s = vm.strings;
+    final result = vm.result!;
     final isHealthy = result.isHealthy;
-    final accent = isHealthy ? AppTheme.success : AppTheme.warning;
+    final accent = AppTheme.semanticPositive(healthy: isHealthy);
+    final diseaseLabel = s.diseaseLabel(result.rawDiseaseLabel);
+    final cropLabel = s.cropLabel(vm.selectedCrop.id);
+    final recommendation = result.recommendation ??
+        s.recommendation(result.recommendationKey ?? 'rec_healthy');
 
-    return KulimaCard(
-      accentColor: accent,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        AppSpacing.md,
+        AppSpacing.screenPadding,
+        AppSpacing.md,
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                decoration: BoxDecoration(
-                  color: accent.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.xl),
+                  decoration: BoxDecoration(
+                    gradient: isHealthy
+                        ? AppTheme.primaryGradient
+                        : LinearGradient(
+                            colors: [
+                              AppTheme.warning.withValues(alpha: 0.9),
+                              AppTheme.warning,
+                            ],
+                          ),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.radiusLg),
+                    boxShadow: [AppTheme.cardShadow],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (vm.imagePath != null)
+                            ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(AppSpacing.radiusSm),
+                              child: SizedBox(
+                                width: 64,
+                                height: 64,
+                                child: Image.file(
+                                  File(vm.imagePath!),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          if (vm.imagePath != null)
+                            const SizedBox(width: AppSpacing.md),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  cropLabel,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  diseaseLabel,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 22,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ConfidenceBadge(
+                            confidence: result.confidence,
+                            isHealthy: isHealthy,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(
+                        recommendation,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Row(
+                        children: [
+                          Icon(
+                            result.isOffline
+                                ? Icons.cloud_off_rounded
+                                : Icons.cloud_done_rounded,
+                            size: 14,
+                            color: Colors.white70,
+                          ),
+                          const SizedBox(width: AppSpacing.xs),
+                          Text(
+                            result.isOffline
+                                ? s.t('scan_offline')
+                                : s.t('scan_online'),
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                child: Icon(
-                  isHealthy
-                      ? Icons.check_circle_rounded
-                      : Icons.warning_amber_rounded,
-                  color: accent,
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Text(
-                  s.diseaseLabel(result.rawDiseaseLabel),
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ),
-              ConfidenceBadge(
-                confidence: result.confidence,
-                isHealthy: isHealthy,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _MetaRow(
-            icon: Icons.wifi_tethering_rounded,
-            label: result.isOffline ? s.t('scan_offline') : s.t('scan_online'),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              color: AppTheme.surface,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                if (result.actions.isNotEmpty ||
+                    result.likelyDiseases.length > 1) ...[
+                  const SizedBox(height: AppSpacing.md),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: KulimaCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (result.actions.isNotEmpty) ...[
+                              Text(
+                                s.t('scan_treatment_suggestions'),
+                                style: Theme.of(context).textTheme.titleSmall,
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              ...result.actions.asMap().entries.map(
+                                    (e) => Padding(
+                                      padding: const EdgeInsets.only(
+                                          bottom: AppSpacing.sm),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: 24,
+                                            height: 24,
+                                            alignment: Alignment.center,
+                                            decoration: BoxDecoration(
+                                              color: accent.withValues(
+                                                  alpha: 0.12),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Text(
+                                              '${e.key + 1}',
+                                              style: TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w800,
+                                                color: accent,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width: AppSpacing.sm),
+                                          Expanded(
+                                            child: Text(
+                                              e.value,
+                                              style: const TextStyle(
+                                                height: 1.45,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                            ],
+                            if (result.likelyDiseases.length > 1) ...[
+                              if (result.actions.isNotEmpty)
+                                const SizedBox(height: AppSpacing.md),
+                              Text(
+                                s.t('scan_likely_diseases'),
+                                style: Theme.of(context).textTheme.titleSmall,
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              ...result.likelyDiseases.map(
+                                (d) => Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: AppSpacing.xs),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.bug_report_outlined,
+                                        size: 16,
+                                        color: AppTheme.textSecondary,
+                                      ),
+                                      const SizedBox(width: AppSpacing.sm),
+                                      Expanded(
+                                        child: Text(
+                                          s.diseaseLabel(d.label),
+                                        ),
+                                      ),
+                                      Text(
+                                        '${(d.confidence * 100).toStringAsFixed(0)}%',
+                                        style: const TextStyle(
+                                          color: AppTheme.textSecondary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          FilledButton.icon(
+            onPressed: vm.startNewScan,
+            icon: const Icon(Icons.camera_alt_rounded),
+            label: Text(s.t('scan_again')),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Shared widgets ────────────────────────────────────────────────────────────
+
+class _FarmContextBanner extends StatelessWidget {
+  const _FarmContextBanner({required this.vm, required this.strings});
+  final ScanViewModel vm;
+  final AppStrings strings;
+
+  @override
+  Widget build(BuildContext context) {
+    return KulimaCard(
+      child: Row(
+        children: [
+          const Icon(Icons.landscape_rounded,
+              color: AppTheme.primary, size: 22),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  strings.t('farm_scan_for'),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: AppTheme.textSecondary),
+                ),
+                Text(
+                  vm.farmName ?? '',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 15,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: vm.clearFarmContext,
+            child: Text(strings.t('farm_scan_clear')),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NoCropsWarning extends StatelessWidget {
+  const _NoCropsWarning({required this.strings});
+  final AppStrings strings;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppTheme.warning.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        border: Border.all(color: AppTheme.warning.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline_rounded,
+              color: AppTheme.warning, size: 20),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
             child: Text(
-              result.recommendation ??
-                  s.recommendation(result.recommendationKey ?? 'rec_healthy'),
-              style: const TextStyle(height: 1.5, color: AppTheme.textPrimary),
+              strings.t('scan_farm_no_crops'),
+              style: const TextStyle(fontSize: 13),
             ),
           ),
         ],
@@ -269,20 +511,87 @@ class _ResultCard extends StatelessWidget {
   }
 }
 
-class _MetaRow extends StatelessWidget {
-  const _MetaRow({required this.icon, required this.label});
-
-  final IconData icon;
-  final String label;
+class _InfoBanner extends StatelessWidget {
+  const _InfoBanner({required this.message});
+  final String message;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: AppTheme.textSecondary),
-        const SizedBox(width: AppSpacing.sm),
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppTheme.primarySoft,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        border: Border.all(color: AppTheme.border),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline_rounded,
+              color: AppTheme.primary, size: 20),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(message, style: Theme.of(context).textTheme.bodySmall),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ImagePreview extends StatelessWidget {
+  const _ImagePreview({
+    this.path,
+    required this.placeholder,
+    this.compact = false,
+  });
+
+  final String? path;
+  final String placeholder;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImage = path != null;
+    final height = compact ? 140.0 : 200.0;
+
+    return SizedBox(
+      height: height,
+      width: double.infinity,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: AppTheme.surfaceElevated,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          border: Border.all(
+            color: hasImage ? AppTheme.primary : AppTheme.border,
+            width: hasImage ? 2 : 1,
+          ),
+        ),
+        child: hasImage
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSm - 2),
+                child: Image.file(File(path!), fit: BoxFit.cover),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.add_a_photo_rounded,
+                    size: compact ? 32 : 40,
+                    color: AppTheme.primary,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    placeholder,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 }

@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'api_logger.dart';
+import 'backend_connection_result.dart';
 
 // ── Response models ────────────────────────────────────────────────────────────
 
@@ -12,6 +16,8 @@ class BackendAnalysisResult {
     required this.confidence,
     required this.recommendation,
     required this.allProbabilities,
+    this.severity,
+    this.actions = const [],
     this.diagnosisId,
   });
 
@@ -19,6 +25,8 @@ class BackendAnalysisResult {
   final double confidence;
   final String recommendation;
   final Map<String, double> allProbabilities;
+  final String? severity;
+  final List<String> actions;
   final String? diagnosisId;
 }
 
@@ -80,7 +88,8 @@ class BackendFarm {
         lastScannedAt: j['last_scanned_at'] != null
             ? DateTime.tryParse(j['last_scanned_at'] as String)
             : null,
-        createdAt: DateTime.parse(j['created_at'] as String),
+        createdAt: DateTime.tryParse(j['created_at'] as String? ?? '') ??
+            DateTime.now(),
         notes: (j['notes'] as String?) ?? '',
         healthScore: (j['health_score'] as num?)?.toDouble(),
       );
@@ -146,9 +155,13 @@ class BackendDiagnosis {
 class BackendApiService {
   static const _prefKeyUrl = 'backend_url';
   static const _prefKeyToken = 'backend_token';
-  static const _defaultUrl = 'http://10.0.2.2:8001'; // Android emulator
-  // iOS simulator → 'http://localhost:8001'
-  // Real device   → 'http://<machine-ip>:8001'
+
+  /// Android emulator uses 10.0.2.2 to reach the host; iOS/macOS use localhost.
+  static String get _defaultUrl {
+    if (kIsWeb) return 'http://localhost:8001';
+    if (Platform.isAndroid) return 'http://10.0.2.2:8001';
+    return 'http://localhost:8001';
+  }
 
   String? _cachedUrl;
   String? _cachedToken;
@@ -156,16 +169,32 @@ class BackendApiService {
   // ── Config ─────────────────────────────────────────────────────────────────
 
   Future<String> getBaseUrl() async {
-    if (_cachedUrl != null) return _cachedUrl!;
     final prefs = await SharedPreferences.getInstance();
-    _cachedUrl = prefs.getString(_prefKeyUrl) ?? _defaultUrl;
-    return _cachedUrl!;
+    var url = _cachedUrl ?? prefs.getString(_prefKeyUrl) ?? _defaultUrl;
+    final normalized = _normalizeUrlForPlatform(url);
+    if (normalized != url) {
+      url = normalized;
+      await prefs.setString(_prefKeyUrl, url);
+    }
+    _cachedUrl = url;
+    return url;
+  }
+
+  String _normalizeUrlForPlatform(String url) {
+    if (!kIsWeb && !Platform.isAndroid && url.contains('10.0.2.2')) {
+      return url.replaceFirst('10.0.2.2', 'localhost');
+    }
+    return url;
   }
 
   Future<void> setBaseUrl(String url) async {
-    _cachedUrl = url.trimRight().replaceAll(RegExp(r'/$'), '');
+    final normalized = _normalizeUrlForPlatform(
+      url.trimRight().replaceAll(RegExp(r'/$'), ''),
+    );
+    _cachedUrl = normalized;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_prefKeyUrl, _cachedUrl!);
+    await prefs.setString(_prefKeyUrl, normalized);
+    ApiLogger.info('Backend URL set to $normalized');
   }
 
   Future<String?> getToken() async {
@@ -191,6 +220,27 @@ class BackendApiService {
 
   // ── Request helpers ────────────────────────────────────────────────────────
 
+  void _logFailure(
+    String method,
+    String url, {
+    Object? error,
+    int? statusCode,
+    String? body,
+  }) {
+    ApiLogger.failure(
+      method,
+      url,
+      error: error,
+      statusCode: statusCode,
+      body: body,
+    );
+  }
+
+  String? _errorBody(http.Response res) {
+    final body = res.body.trim();
+    return body.isEmpty ? null : body;
+  }
+
   Future<Map<String, String>> _authHeaders() async {
     final token = await getToken();
     return {
@@ -202,11 +252,12 @@ class BackendApiService {
   // ── Auth ───────────────────────────────────────────────────────────────────
 
   Future<BackendAuthResult?> login(String phone, String password) async {
+    final base = await getBaseUrl();
+    final url = '$base/auth/login';
     try {
-      final base = await getBaseUrl();
       final res = await http
           .post(
-            Uri.parse('$base/auth/login'),
+            Uri.parse(url),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({'phone': phone, 'password': password}),
           )
@@ -220,19 +271,29 @@ class BackendApiService {
           phone: (data['user'] as Map)['phone'] as String,
         );
         await _saveToken(result.accessToken);
+        ApiLogger.success('POST', url, statusCode: res.statusCode);
         return result;
       }
-    } catch (_) {}
+      _logFailure('POST', url,
+          statusCode: res.statusCode, body: _errorBody(res));
+    } on SocketException catch (e) {
+      _logFailure('POST', url, error: 'Network unreachable: $e');
+    } on http.ClientException catch (e) {
+      _logFailure('POST', url, error: 'Connection failed: $e');
+    } catch (e) {
+      _logFailure('POST', url, error: e);
+    }
     return null;
   }
 
   Future<BackendAuthResult?> register(
       String phone, String password, String displayName) async {
+    final base = await getBaseUrl();
+    final url = '$base/auth/register';
     try {
-      final base = await getBaseUrl();
       final res = await http
           .post(
-            Uri.parse('$base/auth/register'),
+            Uri.parse(url),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({
               'phone': phone,
@@ -250,93 +311,151 @@ class BackendApiService {
           phone: (data['user'] as Map)['phone'] as String,
         );
         await _saveToken(result.accessToken);
+        ApiLogger.success('POST', url, statusCode: res.statusCode);
         return result;
       }
-    } catch (_) {}
+      _logFailure('POST', url,
+          statusCode: res.statusCode, body: _errorBody(res));
+    } on SocketException catch (e) {
+      _logFailure('POST', url, error: 'Network unreachable: $e');
+    } on http.ClientException catch (e) {
+      _logFailure('POST', url, error: 'Connection failed: $e');
+    } catch (e) {
+      _logFailure('POST', url, error: e);
+    }
     return null;
   }
 
   // ── Farms ──────────────────────────────────────────────────────────────────
 
   Future<List<BackendFarm>?> getFarms() async {
+    final base = await getBaseUrl();
+    final url = '$base/farms/';
     try {
-      final base = await getBaseUrl();
       final headers = await _authHeaders();
+      if (!headers.containsKey('Authorization')) {
+        _logFailure('GET', url, error: 'No auth token — log in via backend first');
+        return null;
+      }
       final res = await http
-          .get(Uri.parse('$base/farms/'), headers: headers)
+          .get(Uri.parse(url), headers: headers)
           .timeout(const Duration(seconds: 10));
       if (res.statusCode == 200) {
         final list = jsonDecode(res.body) as List;
-        return list
-            .map((e) => BackendFarm.fromJson(e as Map<String, dynamic>))
-            .toList();
+        final farms = <BackendFarm>[];
+        for (final item in list) {
+          try {
+            farms.add(BackendFarm.fromJson(item as Map<String, dynamic>));
+          } catch (e) {
+            _logFailure('GET', url, error: 'Skipping malformed farm: $e');
+          }
+        }
+        ApiLogger.success('GET', url, statusCode: res.statusCode);
+        return farms;
       }
-    } on SocketException {
-      // offline
-    } catch (_) {}
+      _logFailure('GET', url,
+          statusCode: res.statusCode, body: _errorBody(res));
+    } on SocketException catch (e) {
+      _logFailure('GET', url, error: 'Network unreachable: $e');
+    } on http.ClientException catch (e) {
+      _logFailure('GET', url, error: 'Connection failed: $e');
+    } catch (e) {
+      _logFailure('GET', url, error: e);
+    }
     return null;
   }
 
   Future<BackendFarm?> createFarm(BackendFarm farm) async {
+    final base = await getBaseUrl();
+    final url = '$base/farms/';
     try {
-      final base = await getBaseUrl();
       final headers = await _authHeaders();
+      if (!headers.containsKey('Authorization')) {
+        _logFailure('POST', url, error: 'No auth token — saving farm locally only');
+        return null;
+      }
       final res = await http
           .post(
-            Uri.parse('$base/farms/'),
+            Uri.parse(url),
             headers: headers,
             body: jsonEncode(farm.toJson()),
           )
           .timeout(const Duration(seconds: 10));
       if (res.statusCode == 201) {
+        ApiLogger.success('POST', url, statusCode: res.statusCode);
         return BackendFarm.fromJson(
             jsonDecode(res.body) as Map<String, dynamic>);
       }
-    } on SocketException {
-      // offline
-    } catch (_) {}
+      _logFailure('POST', url,
+          statusCode: res.statusCode, body: _errorBody(res));
+    } on SocketException catch (e) {
+      _logFailure('POST', url, error: 'Network unreachable: $e');
+    } on http.ClientException catch (e) {
+      _logFailure('POST', url, error: 'Connection failed: $e');
+    } catch (e) {
+      _logFailure('POST', url, error: e);
+    }
     return null;
   }
 
   Future<bool> updateFarm(String farmId, BackendFarm farm) async {
+    final base = await getBaseUrl();
+    final url = '$base/farms/$farmId';
     try {
-      final base = await getBaseUrl();
       final headers = await _authHeaders();
       final res = await http
           .put(
-            Uri.parse('$base/farms/$farmId'),
+            Uri.parse(url),
             headers: headers,
             body: jsonEncode(farm.toJson()),
           )
           .timeout(const Duration(seconds: 10));
-      return res.statusCode == 200;
-    } on SocketException {
-      // offline
-    } catch (_) {}
+      if (res.statusCode == 200) {
+        ApiLogger.success('PUT', url, statusCode: res.statusCode);
+        return true;
+      }
+      _logFailure('PUT', url,
+          statusCode: res.statusCode, body: _errorBody(res));
+    } on SocketException catch (e) {
+      _logFailure('PUT', url, error: 'Network unreachable: $e');
+    } catch (e) {
+      _logFailure('PUT', url, error: e);
+    }
     return false;
   }
 
   Future<bool> deleteFarm(String farmId) async {
+    final base = await getBaseUrl();
+    final url = '$base/farms/$farmId';
     try {
-      final base = await getBaseUrl();
       final headers = await _authHeaders();
       final res = await http
-          .delete(Uri.parse('$base/farms/$farmId'), headers: headers)
+          .delete(Uri.parse(url), headers: headers)
           .timeout(const Duration(seconds: 10));
-      return res.statusCode == 204 || res.statusCode == 200;
-    } on SocketException {
-      // offline
-    } catch (_) {}
+      if (res.statusCode == 204 ||
+          res.statusCode == 200 ||
+          res.statusCode == 404) {
+        ApiLogger.success('DELETE', url, statusCode: res.statusCode);
+        return true;
+      }
+      _logFailure('DELETE', url,
+          statusCode: res.statusCode, body: _errorBody(res));
+    } on SocketException catch (e) {
+      _logFailure('DELETE', url, error: 'Network unreachable: $e');
+    } catch (e) {
+      _logFailure('DELETE', url, error: e);
+    }
     return false;
   }
 
   // ── Diagnoses ──────────────────────────────────────────────────────────────
 
   Future<List<BackendDiagnosis>?> getDiagnoses({String? farmId}) async {
+    final base = await getBaseUrl();
+    final url = '$base/diagnoses/';
     try {
-      final base = await getBaseUrl();
       final headers = await _authHeaders();
-      final uri = Uri.parse('$base/diagnoses/').replace(
+      final uri = Uri.parse(url).replace(
         queryParameters: farmId != null ? {'farm_id': farmId} : null,
       );
       final res = await http
@@ -344,13 +463,18 @@ class BackendApiService {
           .timeout(const Duration(seconds: 10));
       if (res.statusCode == 200) {
         final list = jsonDecode(res.body) as List;
+        ApiLogger.success('GET', uri.toString(), statusCode: res.statusCode);
         return list
             .map((e) => BackendDiagnosis.fromJson(e as Map<String, dynamic>))
             .toList();
       }
-    } on SocketException {
-      // offline
-    } catch (_) {}
+      _logFailure('GET', uri.toString(),
+          statusCode: res.statusCode, body: _errorBody(res));
+    } on SocketException catch (e) {
+      _logFailure('GET', url, error: 'Network unreachable: $e');
+    } catch (e) {
+      _logFailure('GET', url, error: e);
+    }
     return null;
   }
 
@@ -361,15 +485,16 @@ class BackendApiService {
     required String crop,
     String? farmId,
   }) async {
+    final base = await getBaseUrl();
+    final url = '$base/analyze/image';
     try {
-      final base = await getBaseUrl();
       final token = await getToken();
-      if (token == null) return null;
+      if (token == null) {
+        _logFailure('POST', url, error: 'No auth token');
+        return null;
+      }
 
-      final request = http.MultipartRequest(
-        'POST',
-        Uri.parse('$base/analyze/image'),
-      )
+      final request = http.MultipartRequest('POST', Uri.parse(url))
         ..headers['Authorization'] = 'Bearer $token'
         ..fields['crop'] = crop
         ..files.add(await http.MultipartFile.fromPath('image', imagePath));
@@ -385,33 +510,82 @@ class BackendApiService {
             (data['all_probabilities'] as Map<String, dynamic>).map(
           (k, v) => MapEntry(k, (v as num).toDouble()),
         );
+        ApiLogger.success('POST', url, statusCode: response.statusCode);
         return BackendAnalysisResult(
           disease: data['disease'] as String,
           confidence: (data['confidence'] as num).toDouble(),
           recommendation: data['recommendation'] as String,
           allProbabilities: probs,
+          severity: data['severity'] as String?,
+          actions: List<String>.from(data['actions'] as List? ?? const []),
           diagnosisId: data['diagnosis_id'] as String?,
         );
       }
-    } on SocketException {
-      // offline
-    } catch (_) {}
+      _logFailure('POST', url,
+          statusCode: response.statusCode, body: _errorBody(response));
+    } on SocketException catch (e) {
+      _logFailure('POST', url, error: 'Network unreachable: $e');
+    } catch (e) {
+      _logFailure('POST', url, error: e);
+    }
     return null;
   }
 
   // ── Health ─────────────────────────────────────────────────────────────────
 
-  Future<bool> isBackendReady() async {
+  /// Probes `/health` and returns a detailed result (also logged to console).
+  Future<BackendConnectionResult> checkConnection() async {
+    final base = await getBaseUrl();
+    final url = '$base/health';
+    ApiLogger.info('Checking $url …');
     try {
-      final base = await getBaseUrl();
       final res = await http
-          .get(Uri.parse('$base/health'))
-          .timeout(const Duration(seconds: 5));
+          .get(Uri.parse(url))
+          .timeout(const Duration(seconds: 8));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
-        return data['ml_model_ready'] == true;
+        final result = BackendConnectionResult.fromHealthJson(
+          url: url,
+          statusCode: res.statusCode,
+          data: data,
+        );
+        ApiLogger.success('GET', url, statusCode: res.statusCode);
+        ApiLogger.info(result.message);
+        return result;
       }
-    } catch (_) {}
-    return false;
+      final message = 'Server returned HTTP ${res.statusCode}';
+      _logFailure('GET', url, statusCode: res.statusCode, body: _errorBody(res));
+      return BackendConnectionResult.unreachable(
+        url: url,
+        message: message,
+        statusCode: res.statusCode,
+      );
+    } on SocketException catch (e) {
+      const hint =
+          'Cannot reach server. On iOS simulator use http://localhost:8001. '
+          'On a real device use your computer IP (e.g. http://192.168.1.x:8001).';
+      _logFailure('GET', url, error: '$e — $hint');
+      return BackendConnectionResult.unreachable(
+        url: url,
+        message: hint,
+      );
+    } on http.ClientException catch (e) {
+      _logFailure('GET', url, error: e);
+      return BackendConnectionResult.unreachable(
+        url: url,
+        message: 'Connection failed: $e',
+      );
+    } catch (e) {
+      _logFailure('GET', url, error: e);
+      return BackendConnectionResult.unreachable(
+        url: url,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<bool> isBackendReady() async {
+    final result = await checkConnection();
+    return result.ok;
   }
 }

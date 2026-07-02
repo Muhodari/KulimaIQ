@@ -35,9 +35,12 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Restores session from device storage (no database).
+  /// Restores session from device storage and reconnects to the backend API.
   Future<void> initialize() async {
     _user = await _authRepository.getCurrentUser();
+    if (_user != null) {
+      await _authRepository.refreshBackendSession();
+    }
     _initialized = true;
     notifyListeners();
   }
