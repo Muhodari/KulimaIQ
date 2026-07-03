@@ -127,10 +127,13 @@ Other vars (`MONGO_DB`, `MODEL_WEIGHTS_PATH`, `ALLOWED_ORIGINS`) are set in `ren
 **Option B — Manual**
 
 1. **New** → **Web Service** → connect repo
-2. **Root Directory:** `backend`
+2. **Root Directory:** `backend` (required — Dockerfile lives here)
 3. **Runtime:** Docker
-4. **Plan:** Free
-5. Add the env vars from the table above plus `MONGO_DB=kulimaiq`, `MODEL_WEIGHTS_PATH=model_weights/kulimaiq_mobilenet.pth`, `ALLOWED_ORIGINS=["*"]`
+4. **Dockerfile Path:** `Dockerfile` (relative to root directory above)
+5. **Plan:** Free
+6. Add the env vars from the table above plus `MONGO_DB=kulimaiq`, `MODEL_WEIGHTS_PATH=model_weights/kulimaiq_mobilenet.pth`, `ALLOWED_ORIGINS=["*"]`
+
+If you see `open Dockerfile: no such file or directory`, the **Root Directory** is wrong — it must be `backend`, not the repo root.
 
 ### 3. After deploy
 

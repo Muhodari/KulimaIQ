@@ -1,0 +1,14 @@
+.git
+.gitignore
+kulimaiq_app/
+backend/.env
+backend/.venv/
+backend/__pycache__/
+backend/*.pyc
+backend/data/
+backend/notebooks/
+backend/scripts/_dl_*/
+backend/scripts/*.zip
+backend/scripts/New*/
+presentation.html
+PRESENTATION.md
