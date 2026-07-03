@@ -32,15 +32,6 @@ class DiseaseInferenceService {
     );
 
     if (backendResult != null) {
-      final cropFiltered = _filterProbabilitiesByCrop(
-        backendResult.allProbabilities,
-        crop.id,
-      );
-      final likelyDiseases = cropFiltered.entries.toList()
-        ..sort((a, b) => b.value.compareTo(a.value));
-      // The backend returns the exact class label (e.g. "tomato_late_blight").
-      // DiseaseType.fromId returns null for labels not yet in the enum —
-      // that is fine, we pass null and the UI shows the raw label gracefully.
       final disease = DiseaseType.fromId(backendResult.disease);
       return InferenceOutput(
         disease: disease,
@@ -49,10 +40,7 @@ class DiseaseInferenceService {
         confidence: backendResult.confidence,
         severity: backendResult.severity,
         actions: backendResult.actions,
-        likelyDiseases: likelyDiseases
-            .take(3)
-            .map((e) => LikelyDisease(label: e.key, confidence: e.value))
-            .toList(),
+        likelyDiseases: const [],
         source: InferenceSource.backend,
         backendDiagnosisId: backendResult.diagnosisId,
       );
@@ -79,12 +67,7 @@ class DiseaseInferenceService {
       confidence: confidence.clamp(0.0, 0.99),
       severity: null,
       actions: const [],
-      likelyDiseases: [
-        LikelyDisease(
-          label: disease?.id ?? 'healthy',
-          confidence: confidence.clamp(0.0, 0.99),
-        ),
-      ],
+      likelyDiseases: const [],
       source: InferenceSource.offline,
     );
   }
@@ -135,28 +118,6 @@ class DiseaseInferenceService {
       default:
         return [DiseaseType.healthy];
     }
-  }
-
-  Map<String, double> _filterProbabilitiesByCrop(
-    Map<String, double> allProbabilities,
-    String cropId,
-  ) {
-    final filtered = <String, double>{};
-    for (final entry in allProbabilities.entries) {
-      if (entry.key == 'healthy' || entry.key.startsWith('${cropId}_')) {
-        filtered[entry.key] = entry.value;
-      }
-    }
-    if (filtered.isEmpty) {
-      return allProbabilities;
-    }
-    final total = filtered.values.fold<double>(0, (sum, value) => sum + value);
-    if (total <= 0) {
-      return filtered;
-    }
-    return {
-      for (final entry in filtered.entries) entry.key: entry.value / total,
-    };
   }
 }
 

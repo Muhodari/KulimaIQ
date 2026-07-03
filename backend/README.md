@@ -64,14 +64,91 @@ cd backend
 
 # 1. Copy and edit env file
 cp .env.example .env
-# Edit .env – at minimum change SECRET_KEY
+# Edit .env – set MONGO_URL (Atlas or local) and change SECRET_KEY
 
-# 2. Start MongoDB + API
+# 2. Start MongoDB + API (local Mongo only — skip if using Atlas)
 docker compose up -d
 
-# 3. Open interactive API docs
+# 3. Run API (Atlas: set MONGO_URL in .env first)
+source .venv/bin/activate
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+
+# 4. Open interactive API docs
 open http://localhost:8001/docs
 ```
+
+### MongoDB Atlas
+
+Set in `backend/.env`:
+
+```env
+MONGO_URL=mongodb+srv://<user>:<password>@cluster0.xxxxx.mongodb.net/kulimaiq?retryWrites=true&w=majority
+MONGO_DB=kulimaiq
+```
+
+On startup the API creates indexes and uses three collections:
+
+| Collection | Stores |
+|------------|--------|
+| `users` | Accounts (phone, password hash, display name) |
+| `farms` | Farm profiles (location, crops, health score) |
+| `diagnoses` | Scan results (crop, disease, recommendation, confidence) |
+
+Check connection: `GET /health` → `mongodb_connected: true`
+
+---
+
+## Deploy to Render (free)
+
+The repo includes a [Render Blueprint](../render.yaml) (Docker, free tier, Frankfurt region).
+
+### 1. Prerequisites
+
+- Code pushed to **GitHub** (include `backend/model_weights/kulimaiq_mobilenet.pth` — required for ML scans)
+- **MongoDB Atlas** cluster running (you already use this)
+- Atlas → **Network Access** → allow `0.0.0.0/0` (so Render can connect)
+
+### 2. Create the service
+
+**Option A — Blueprint (recommended)**
+
+1. [render.com](https://render.com) → **New** → **Blueprint**
+2. Connect your GitHub repo
+3. Render reads `render.yaml` at the repo root
+4. When prompted, set these **secret** env vars (copy from your local `backend/.env`):
+
+| Key | Value |
+|-----|--------|
+| `MONGO_URL` | Your Atlas URI (`mongodb+srv://...@cluster0....mongodb.net/kulimaiq?retryWrites=true&w=majority`) |
+| `SECRET_KEY` | Your JWT secret from `.env` |
+
+Other vars (`MONGO_DB`, `MODEL_WEIGHTS_PATH`, `ALLOWED_ORIGINS`) are set in `render.yaml`.
+
+**Option B — Manual**
+
+1. **New** → **Web Service** → connect repo
+2. **Root Directory:** `backend`
+3. **Runtime:** Docker
+4. **Plan:** Free
+5. Add the env vars from the table above plus `MONGO_DB=kulimaiq`, `MODEL_WEIGHTS_PATH=model_weights/kulimaiq_mobilenet.pth`, `ALLOWED_ORIGINS=["*"]`
+
+### 3. After deploy
+
+- URL looks like `https://kulimaiq-api.onrender.com`
+- Test: `https://kulimaiq-api.onrender.com/health` → `mongodb_connected: true`, `ml_model_ready: true`
+- Docs: `https://kulimaiq-api.onrender.com/docs`
+
+**Free tier notes:** service sleeps after ~15 min idle (first request may take 30–60s). Build can take 5–10 min (PyTorch image).
+
+### 4. Point the Flutter app
+
+In the app → **Profile** → **Backend URL** → paste your Render URL (no trailing slash), e.g.:
+
+```
+https://kulimaiq-api.onrender.com
+```
+
+On a **physical phone**, use the Render URL directly (not `localhost`).
 
 ---
 

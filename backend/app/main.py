@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .config import settings
-from .database import close_db
+from .database import close_db, init_db
 from .ml.inference import init_inference_service
 from .routers import analyze, auth, crops, diagnoses, farms
 from .seed import ensure_demo_user
@@ -14,6 +14,7 @@ from .seed import ensure_demo_user
 async def lifespan(app: FastAPI):
     # ── Startup ───────────────────────────────────────────────────────────────
     init_inference_service(settings.model_weights_path)
+    await init_db()
     await ensure_demo_user()
     yield
     # ── Shutdown ──────────────────────────────────────────────────────────────
@@ -50,10 +51,15 @@ app.include_router(crops.router)
 # ── Health check ──────────────────────────────────────────────────────────────
 @app.get("/health", tags=["system"])
 async def health():
+    from .database import check_db, settings as cfg
     from .ml.inference import get_inference_service
+
     svc = get_inference_service()
+    mongo_ok = await check_db()
     return {
-        "status": "ok",
+        "status": "ok" if mongo_ok else "degraded",
+        "mongodb_connected": mongo_ok,
+        "mongodb_db": cfg.mongo_db,
         "ml_model_ready": svc.is_ready,
         "num_classes": len(svc.classes),
         "classes": svc.classes,

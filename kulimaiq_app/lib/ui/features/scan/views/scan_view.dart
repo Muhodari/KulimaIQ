@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../../../../l10n/app_strings.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/widgets/confidence_badge.dart';
 import '../../../core/widgets/crop_selector.dart';
 import '../../../core/widgets/error_banner.dart';
 import '../../../core/widgets/kulima_card.dart';
@@ -279,10 +278,6 @@ class _ScanResultView extends StatelessWidget {
                               ],
                             ),
                           ),
-                          ConfidenceBadge(
-                            confidence: result.confidence,
-                            isHealthy: isHealthy,
-                          ),
                         ],
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -321,8 +316,7 @@ class _ScanResultView extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (result.actions.isNotEmpty ||
-                    result.likelyDiseases.length > 1) ...[
+                if (result.actions.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.md),
                   Expanded(
                     child: SingleChildScrollView(
@@ -330,90 +324,51 @@ class _ScanResultView extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (result.actions.isNotEmpty) ...[
-                              Text(
-                                s.t('scan_treatment_suggestions'),
-                                style: Theme.of(context).textTheme.titleSmall,
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              ...result.actions.asMap().entries.map(
-                                    (e) => Padding(
-                                      padding: const EdgeInsets.only(
-                                          bottom: AppSpacing.sm),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            width: 24,
-                                            height: 24,
-                                            alignment: Alignment.center,
-                                            decoration: BoxDecoration(
-                                              color: accent.withValues(
-                                                  alpha: 0.12),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: Text(
-                                              '${e.key + 1}',
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w800,
-                                                color: accent,
-                                              ),
+                            Text(
+                              s.t('scan_treatment_suggestions'),
+                              style: Theme.of(context).textTheme.titleSmall,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            ...result.actions.asMap().entries.map(
+                                  (e) => Padding(
+                                    padding: const EdgeInsets.only(
+                                        bottom: AppSpacing.sm),
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          width: 24,
+                                          height: 24,
+                                          alignment: Alignment.center,
+                                          decoration: BoxDecoration(
+                                            color: accent.withValues(
+                                                alpha: 0.12),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Text(
+                                            '${e.key + 1}',
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w800,
+                                              color: accent,
                                             ),
                                           ),
-                                          const SizedBox(
-                                              width: AppSpacing.sm),
-                                          Expanded(
-                                            child: Text(
-                                              e.value,
-                                              style: const TextStyle(
-                                                height: 1.45,
-                                              ),
+                                        ),
+                                        const SizedBox(
+                                            width: AppSpacing.sm),
+                                        Expanded(
+                                          child: Text(
+                                            e.value,
+                                            style: const TextStyle(
+                                              height: 1.45,
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                            ],
-                            if (result.likelyDiseases.length > 1) ...[
-                              if (result.actions.isNotEmpty)
-                                const SizedBox(height: AppSpacing.md),
-                              Text(
-                                s.t('scan_likely_diseases'),
-                                style: Theme.of(context).textTheme.titleSmall,
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              ...result.likelyDiseases.map(
-                                (d) => Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: AppSpacing.xs),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.bug_report_outlined,
-                                        size: 16,
-                                        color: AppTheme.textSecondary,
-                                      ),
-                                      const SizedBox(width: AppSpacing.sm),
-                                      Expanded(
-                                        child: Text(
-                                          s.diseaseLabel(d.label),
-                                        ),
-                                      ),
-                                      Text(
-                                        '${(d.confidence * 100).toStringAsFixed(0)}%',
-                                        style: const TextStyle(
-                                          color: AppTheme.textSecondary,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
                                 ),
-                              ),
-                            ],
                           ],
                         ),
                       ),

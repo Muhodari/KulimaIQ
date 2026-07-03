@@ -1,0 +1,27 @@
+# KulimaIQ backend — Render Blueprint
+# Dashboard: New → Blueprint → connect this repo
+# Set secret env vars in Render after deploy (MONGO_URL, SECRET_KEY).
+
+services:
+  - type: web
+    name: kulimaiq-api
+    runtime: docker
+    rootDir: backend
+    plan: free
+    region: frankfurt
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: MONGO_DB
+        value: kulimaiq
+      - key: MODEL_WEIGHTS_PATH
+        value: model_weights/kulimaiq_mobilenet.pth
+      - key: ML_CONFIDENCE_THRESHOLD
+        value: "0.50"
+      - key: ALLOWED_ORIGINS
+        value: '["*"]'
+      - key: MONGO_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
