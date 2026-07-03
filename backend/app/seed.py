@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from .auth import hash_password
 from .database import users_col
 
-DEMO_PHONE = "+250788000000"
+DEMO_PHONE = "0780000000"
 DEMO_PASSWORD = "farmer123"
 DEMO_NAME = "Demo Farmer"
 

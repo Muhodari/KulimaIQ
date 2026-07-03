@@ -290,6 +290,7 @@ class AppStrings {
     'scan_camera_unavailable_hint':
         'Camera unavailable here — use Gallery to pick a leaf photo.',
     'login_title': 'Sign in',
+    'app_warming_backend': 'Connecting to server…\nFirst launch may take up to a minute.',
     'login_tagline': 'Crop disease detection for smallholder farmers',
     'login_subtitle': 'Sign in to detect crop diseases and get local advisories.',
     'register_subtitle': 'Join farmers using KulimaIQ to protect their crops.',
@@ -647,6 +648,7 @@ class AppStrings {
     'scan_camera_unavailable_hint':
         'Kamera ntiboneka — koresha Gallery guhitamo ifoto y\'ikibabi.',
     'login_title': 'Injira',
+    'app_warming_backend': 'Guhuza na serivisi…\nUbwa mbere bishobora gutwara umunota.',
     'login_tagline': 'Gusuzuma indwara z\'ibihingwa ku bahinzi bato',
     'login_subtitle': 'Injira kugira ngo umenye indwara z\'ibihingwa ukabona inama.',
     'register_subtitle': 'Jya mu bahinzi bakoresha KulimaIQ kurinda ibihingwa.',

@@ -556,6 +556,29 @@ class BackendApiService {
 
   // ── Health ─────────────────────────────────────────────────────────────────
 
+  /// Wake Render (or any hosted API) before login/scan — free tier sleeps when idle.
+  Future<BackendConnectionResult> warmUpBackend({bool background = false}) async {
+    await ensureProductionUrl();
+    if (background &&
+        _lastWarmUp != null &&
+        DateTime.now().difference(_lastWarmUp!) <
+            const Duration(minutes: 5)) {
+      return BackendConnectionResult(
+        reachable: _lastWarmUpOk,
+        mlModelReady: _lastWarmUpOk,
+        message: 'Backend recently warmed up',
+      );
+    }
+    ApiLogger.info('Warming up backend via /health …');
+    final result = await checkConnection();
+    _lastWarmUp = DateTime.now();
+    _lastWarmUpOk = result.ok;
+    return result;
+  }
+
+  DateTime? _lastWarmUp;
+  bool _lastWarmUpOk = false;
+
   /// Probes `/health` and returns a detailed result (also logged to console).
   Future<BackendConnectionResult> checkConnection() async {
     final base = await getBaseUrl();

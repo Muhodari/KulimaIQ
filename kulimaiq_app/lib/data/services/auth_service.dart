@@ -22,7 +22,7 @@ class AuthService {
   final PreferencesService _preferencesService;
   final BackendApiService _backendApiService;
 
-  static const demoPhone = '+250788000000';
+  static const demoPhone = '0780000000';
   static const demoPassword = 'farmer123';
   static const demoName = 'Demo Farmer';
 
