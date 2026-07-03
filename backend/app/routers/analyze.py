@@ -23,7 +23,12 @@ from PIL import Image
 
 from ..auth import get_current_user
 from ..database import diagnoses_col, farms_col
-from ..ml.inference import filter_probs_by_crop, get_inference_service
+from ..ml.inference import (
+    filter_probs_by_crop,
+    get_inference_service,
+    normalize_probs,
+    pick_crop_label,
+)
 from ..models.diagnosis import AnalyzeResult
 
 router = APIRouter(prefix="/analyze", tags=["analyze"])
@@ -92,8 +97,8 @@ async def _run_analysis(
         raise HTTPException(status_code=400, detail="Invalid image file")
 
     raw_probabilities = svc.predict(image)
-    probabilities = filter_probs_by_crop(raw_probabilities, crop)
-    if not probabilities:
+    filtered_probs = filter_probs_by_crop(raw_probabilities, crop)
+    if not filtered_probs:
         supported = sorted(
             {
                 label.split("_", 1)[0]
@@ -109,8 +114,8 @@ async def _run_analysis(
             ),
         )
 
-    top_label = max(probabilities, key=lambda k: probabilities[k])
-    confidence = probabilities[top_label]
+    top_label, confidence = pick_crop_label(filtered_probs)
+    probabilities = normalize_probs(filtered_probs)
 
     recommendation = _get_recommendation(top_label)
     severity = _get_severity(top_label)

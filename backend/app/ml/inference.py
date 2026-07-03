@@ -60,22 +60,60 @@ def filter_probs_by_crop(
     all_probs: dict[str, float], crop: str
 ) -> dict[str, float]:
     """
-    Keep only classes for the selected crop (+ shared healthy), then re-normalize.
+    Keep only classes for the selected crop (+ shared healthy).
 
-    Without this step a multi-crop model can return e.g. tomato_late_blight when
-    the user scanned cassava leaves with crop=cassava.
+    Returns raw softmax probabilities (not re-normalized). Re-normalizing within
+    a crop inflates "healthy" when all scores are low — the main cause of false
+    healthy predictions in the app.
     """
-    filtered = {
+    return {
         label: prob
         for label, prob in all_probs.items()
         if label == "healthy" or label.startswith(f"{crop}_")
     }
-    if not filtered:
+
+
+def normalize_probs(probs: dict[str, float]) -> dict[str, float]:
+    """Re-normalize for display only (percentages within the crop)."""
+    if not probs:
         return {}
-    total = sum(filtered.values())
+    total = sum(probs.values())
     if total <= 0:
-        return filtered
-    return {label: prob / total for label, prob in filtered.items()}
+        return dict(probs)
+    return {label: prob / total for label, prob in probs.items()}
+
+
+def pick_crop_label(filtered_probs: dict[str, float]) -> tuple[str, float]:
+    """
+    Choose the best label for a crop scan.
+
+    Prefer the strongest disease over the shared "healthy" bucket unless healthy
+    clearly wins on raw model confidence.
+    """
+    if not filtered_probs:
+        return "healthy", 0.0
+
+    healthy_prob = filtered_probs.get("healthy", 0.0)
+    disease_probs = {
+        label: prob
+        for label, prob in filtered_probs.items()
+        if label != "healthy"
+    }
+    if not disease_probs:
+        return "healthy", healthy_prob
+
+    best_disease, best_disease_prob = max(
+        disease_probs.items(), key=lambda item: item[1]
+    )
+    # In scan flow, false "healthy" is worse than naming a likely disease.
+    # Only return healthy when the model is clearly confident it is healthy.
+    healthy_clearly_wins = (
+        healthy_prob >= 0.25
+        and healthy_prob > best_disease_prob * 1.25
+    )
+    if healthy_clearly_wins:
+        return "healthy", healthy_prob
+    return best_disease, best_disease_prob
 
 
 # ── Module-level singleton ────────────────────────────────────────────────────

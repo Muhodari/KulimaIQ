@@ -1256,6 +1256,25 @@ def _prune_non_core(train_dir: Path, val_dir: Path, keep: frozenset[str]) -> Non
                 shutil.rmtree(cls_dir)
 
 
+def _remove_empty_class_dirs(train_dir: Path, val_dir: Path) -> list[str]:
+    """Drop class folders with no images so ImageFolder training can start."""
+    removed: list[str] = []
+    for root in (train_dir, val_dir):
+        if not root.exists():
+            continue
+        for cls_dir in list(root.iterdir()):
+            if not cls_dir.is_dir():
+                continue
+            has_image = any(is_image(p) for p in cls_dir.rglob("*") if p.is_file())
+            if not has_image:
+                shutil.rmtree(cls_dir)
+                if cls_dir.name not in removed:
+                    removed.append(cls_dir.name)
+    if removed:
+        print(f"  Removed {len(removed)} empty class folders: {', '.join(sorted(removed))}")
+    return removed
+
+
 def _purge_synthetic_images(train_dir: Path, val_dir: Path) -> int:
     """Remove prior synthetic placeholder images."""
     removed = 0
@@ -1455,6 +1474,7 @@ def main(
         min_required=min_required,
         allow_synthetic=allow_synthetic,
     )
+    _remove_empty_class_dirs(train_dir, val_dir)
 
     if not skip_expand:
         print("\n[expand] Same disease, different location looks (train only)")

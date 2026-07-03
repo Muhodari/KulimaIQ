@@ -30,7 +30,7 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, WeightedRandomSampler
 from torchvision import datasets
 
 from .agro_style import (
@@ -87,8 +87,6 @@ def train(
     print(f"[train_robust] {num_classes} classes | train {len(train_ds)} "
           f"| val {len(val_clean)}")
 
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
-                              num_workers=2, pin_memory=True)
     val_clean_loader = DataLoader(val_clean, batch_size=batch_size, shuffle=False,
                                   num_workers=0)
     # Held-out location-shift evaluation domains.
@@ -116,11 +114,26 @@ def train(
     for _, y in train_ds.samples:
         counts[y] += 1
     total = sum(counts)
-    weights = torch.tensor(
-        [total / (num_classes * c) if c else 1.0 for c in counts],
-        dtype=torch.float, device=device,
+    class_weights: list[float] = []
+    sample_weights: list[float] = []
+    for idx, name in enumerate(classes):
+        c = counts[idx]
+        w = total / (num_classes * c) if c else 1.0
+        if name == "healthy":
+            w *= 0.35
+        class_weights.append(w)
+    weights = torch.tensor(class_weights, dtype=torch.float, device=device)
+    for _, y in train_ds.samples:
+        sw = 1.0 / max(counts[y], 1)
+        if classes[y] == "healthy":
+            sw *= 0.4
+        sample_weights.append(sw)
+    sampler = WeightedRandomSampler(
+        sample_weights, num_samples=len(sample_weights), replacement=True
     )
-    criterion = nn.CrossEntropyLoss(weight=weights, label_smoothing=0.1)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, sampler=sampler,
+                              num_workers=2, pin_memory=True)
+    criterion = nn.CrossEntropyLoss(weight=weights, label_smoothing=0.05)
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
 

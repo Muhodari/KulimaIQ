@@ -11,7 +11,6 @@ EPOCHS="${EPOCHS:-25}"
 echo "==> Prepare moderate real dataset (cap=${CLASS_CAP}, limit=${LIMIT}/source)"
 .venv/bin/python scripts/prepare_data.py \
   --moderate \
-  --fresh \
   --skip-expand \
   --class-cap "${CLASS_CAP}" \
   --limit "${LIMIT}"
@@ -20,7 +19,6 @@ echo "==> Train location-invariant model (epochs=${EPOCHS})"
 .venv/bin/python -m app.ml.train_robust \
   --data_dir data \
   --epochs "${EPOCHS}" \
-  --batch_size 32 \
-  --init_weights model_weights/kulimaiq_mobilenet_baseline.pth
+  --batch_size 32
 
 echo "==> Done."
