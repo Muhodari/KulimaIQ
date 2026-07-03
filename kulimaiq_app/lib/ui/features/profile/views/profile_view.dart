@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../data/services/backend_api_service.dart';
+import '../../../../data/services/backend_connection_result.dart';
 import '../../../../domain/models/crop_type.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
@@ -125,6 +127,9 @@ class _ProfileViewState extends State<ProfileView> {
                 ),
               ),
               const SizedBox(height: AppSpacing.xxl),
+              SectionHeader(title: s.t('profile_backend_title')),
+              _BackendServerCard(strings: s),
+              const SizedBox(height: AppSpacing.xxl),
               SectionHeader(title: s.t('section_preferences')),
               const KulimaCard(
                 child: LanguageSelector(),
@@ -214,6 +219,114 @@ class _AccountHeader extends StatelessWidget {
                   ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BackendServerCard extends StatefulWidget {
+  const _BackendServerCard({required this.strings});
+  final dynamic strings;
+
+  @override
+  State<_BackendServerCard> createState() => _BackendServerCardState();
+}
+
+class _BackendServerCardState extends State<_BackendServerCard> {
+  String _url = BackendApiService.productionUrl;
+  BackendConnectionResult? _result;
+  bool _checking = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadAndTest());
+  }
+
+  Future<void> _loadAndTest() async {
+    final api = context.read<BackendApiService>();
+    await api.ensureProductionUrl();
+    final url = await api.getBaseUrl();
+    if (mounted) setState(() => _url = url);
+    await _test();
+  }
+
+  Future<void> _test() async {
+    setState(() {
+      _checking = true;
+      _result = null;
+    });
+    final result = await context.read<BackendApiService>().checkConnection();
+    if (mounted) {
+      setState(() {
+        _result = result;
+        _checking = false;
+      });
+    }
+  }
+
+  String _statusText() {
+    final s = widget.strings;
+    if (_checking) return s.t('profile_backend_checking');
+    if (_result == null) return s.t('profile_backend_not_tested');
+    if (_result!.ok) return s.t('profile_backend_ready');
+    if (_result!.reachable) return s.t('profile_backend_no_model');
+    return s.t('profile_backend_unreachable');
+  }
+
+  Color _statusColor() {
+    if (_checking) return AppTheme.textSecondary;
+    if (_result?.ok == true) return AppTheme.primary;
+    if (_result?.reachable == true) return AppTheme.warning;
+    return AppTheme.error;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = widget.strings;
+    return KulimaCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            _url,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              Icon(
+                _checking
+                    ? Icons.hourglass_top_rounded
+                    : (_result?.ok == true
+                        ? Icons.cloud_done_rounded
+                        : Icons.cloud_off_rounded),
+                size: 18,
+                color: _statusColor(),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  _statusText(),
+                  style: TextStyle(
+                    color: _statusColor(),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          OutlinedButton.icon(
+            onPressed: _checking ? null : _test,
+            icon: const Icon(Icons.refresh_rounded, size: 18),
+            label: Text(s.t('profile_backend_test')),
           ),
         ],
       ),

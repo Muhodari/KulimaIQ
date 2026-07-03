@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../features/auth/view_models/auth_view_model.dart';
 import '../features/auth/views/login_view.dart';
 import '../features/onboarding/views/onboarding_view.dart';
+import '../../data/services/backend_api_service.dart';
 import 'app_shell.dart';
 import 'app_shell_view_model.dart';
 
@@ -19,8 +20,10 @@ class _AppGateState extends State<AppGate> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AuthViewModel>().initialize();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final auth = context.read<AuthViewModel>();
+      await context.read<BackendApiService>().ensureProductionUrl();
+      await auth.initialize();
     });
   }
 

@@ -156,11 +156,30 @@ class BackendApiService {
   static const _prefKeyUrl = 'backend_url';
   static const _prefKeyToken = 'backend_token';
 
-  /// Android emulator uses 10.0.2.2 to reach the host; iOS/macOS use localhost.
-  static String get _defaultUrl {
-    if (kIsWeb) return 'http://localhost:8001';
-    if (Platform.isAndroid) return 'http://10.0.2.2:8001';
-    return 'http://localhost:8001';
+  /// Production API (Render). Used as default for all platforms.
+  static const productionUrl = 'https://kulimaiq.onrender.com';
+
+  static String get _defaultUrl => productionUrl;
+
+  static bool _isLegacyLocalUrl(String url) {
+    final lower = url.toLowerCase();
+    return lower.contains('localhost') ||
+        lower.contains('127.0.0.1') ||
+        lower.contains('10.0.2.2') ||
+        lower.contains(':8000') ||
+        lower.contains(':8001');
+  }
+
+  /// Point the app at the hosted API (migrates old localhost URLs).
+  Future<void> ensureProductionUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_prefKeyUrl);
+    if (saved == null ||
+        saved.trim().isEmpty ||
+        _isLegacyLocalUrl(saved)) {
+      await setBaseUrl(productionUrl);
+      ApiLogger.info('Backend URL set to $productionUrl');
+    }
   }
 
   String? _cachedUrl;
@@ -171,6 +190,10 @@ class BackendApiService {
   Future<String> getBaseUrl() async {
     final prefs = await SharedPreferences.getInstance();
     var url = _cachedUrl ?? prefs.getString(_prefKeyUrl) ?? _defaultUrl;
+    if (_isLegacyLocalUrl(url)) {
+      url = productionUrl;
+      await prefs.setString(_prefKeyUrl, url);
+    }
     final normalized = _normalizeUrlForPlatform(url);
     if (normalized != url) {
       url = normalized;
@@ -261,7 +284,7 @@ class BackendApiService {
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode({'phone': phone, 'password': password}),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 90));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         final result = BackendAuthResult(
@@ -301,7 +324,7 @@ class BackendApiService {
               'display_name': displayName,
             }),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(const Duration(seconds: 90));
       if (res.statusCode == 201) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         final result = BackendAuthResult(
@@ -501,7 +524,7 @@ class BackendApiService {
       if (farmId != null) request.fields['farm_id'] = farmId;
 
       final streamed =
-          await request.send().timeout(const Duration(seconds: 30));
+          await request.send().timeout(const Duration(seconds: 120));
       final response = await http.Response.fromStream(streamed);
 
       if (response.statusCode == 200) {
@@ -541,7 +564,7 @@ class BackendApiService {
     try {
       final res = await http
           .get(Uri.parse(url))
-          .timeout(const Duration(seconds: 8));
+          .timeout(const Duration(seconds: 90));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         final result = BackendConnectionResult.fromHealthJson(
@@ -562,8 +585,9 @@ class BackendApiService {
       );
     } on SocketException catch (e) {
       const hint =
-          'Cannot reach server. On iOS simulator use http://localhost:8001. '
-          'On a real device use your computer IP (e.g. http://192.168.1.x:8001).';
+          'Cannot reach server. Check your internet connection. '
+          'The hosted API is https://kulimaiq.onrender.com — '
+          'first request after idle may take up to a minute.';
       _logFailure('GET', url, error: '$e — $hint');
       return BackendConnectionResult.unreachable(
         url: url,
