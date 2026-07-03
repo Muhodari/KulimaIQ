@@ -21,8 +21,25 @@ def get_db() -> AsyncIOMotorDatabase:
 
 async def init_db() -> None:
     """Verify Atlas/local MongoDB and ensure indexes on all app collections."""
+    url = settings.mongo_url.strip()
+    if not url or url.startswith("mongodb://localhost") or url == "mongodb://127.0.0.1:27017":
+        raise RuntimeError(
+            "MONGO_URL is missing or still set to localhost. "
+            "On Render, open your service → Environment → add MONGO_URL with your "
+            "MongoDB Atlas URI, e.g. "
+            "mongodb+srv://USER:PASSWORD@cluster0.xxxxx.mongodb.net/kulimaiq"
+            "?retryWrites=true&w=majority"
+        )
+
     client = get_client()
-    await client.admin.command("ping")
+    try:
+        await client.admin.command("ping")
+    except Exception as exc:
+        raise RuntimeError(
+            "Could not connect to MongoDB. Check MONGO_URL on Render and allow "
+            "0.0.0.0/0 in Atlas → Network Access. "
+            f"Original error: {exc}"
+        ) from exc
 
     db = get_db()
     await db["users"].create_index("phone", unique=True)

@@ -122,6 +122,8 @@ The repo includes a [Render Blueprint](../render.yaml) (Docker, free tier, Frank
 | `MONGO_URL` | Your Atlas URI (`mongodb+srv://...@cluster0....mongodb.net/kulimaiq?retryWrites=true&w=majority`) |
 | `SECRET_KEY` | Your JWT secret from `.env` |
 
+> **If deploy crashes with `localhost:27017 Connection refused`:** `MONGO_URL` was not set on Render. Open the service → **Environment** → add `MONGO_URL` → **Save Changes** (triggers redeploy).
+
 Other vars (`MONGO_DB`, `MODEL_WEIGHTS_PATH`, `ALLOWED_ORIGINS`) are set in `render.yaml`.
 
 **Option B — Manual**
