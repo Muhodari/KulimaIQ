@@ -18,7 +18,9 @@
 
 **Live API:** [https://kulimaiq.onrender.com](https://kulimaiq.onrender.com)  
 **Health check:** [https://kulimaiq.onrender.com/health](https://kulimaiq.onrender.com/health)  
-**Demo video:** [Watch on YouTube](https://youtu.be/aws6PzC_dQk)
+**API docs (Swagger):** [https://kulimaiq.onrender.com/docs](https://kulimaiq.onrender.com/docs)  
+**Demo video:** [Watch on YouTube](https://youtu.be/aws6PzC_dQk)  
+**Download APK:** [KulimaIQ Android app (Google Drive)](https://drive.google.com/file/d/1IL1H0MbSEHzEMC1JyYtnmQVA7mYf5NzX/view?usp=sharing)
 
 **Capstone project** — African Leadership University, BSc Software Engineering  
 **Author:** Sage Muhodari · **Supervisor:** Emmanuel Adjei
